@@ -11,7 +11,7 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 0.4 Auth: Supabase Auth with Google and GitHub providers; sign-in page; middleware that redirects signed-out users. **Done when:** you can sign in with Google and with GitHub on the live URL; a signed-out visit to `/today` redirects.
 - [x] 0.5 Invite gate: `INVITE_CODE` env var checked once at first sign-in, stored on `users`. **Done when:** a new account without the code is shown "invite only" and cannot reach `/today`.
 - [x] 0.6 `users` table + RLS + trigger that creates the row on sign-up. Export-all and delete-account routes. **Done when:** a vitest integration test proves user A cannot select user B's row with A's JWT.
-- [ ] 0.7 CI: GitHub Actions running lint, typecheck, vitest, and gitleaks on every push. **Done when:** a PR with a fake `sk-ant-` string fails CI.
+- [x] 0.7 CI: GitHub Actions running lint, typecheck, vitest, and gitleaks on every push. **Done when:** a PR with a fake `sk-ant-` string fails CI.
 - [ ] 0.8 PWA: manifest, icons, `theme-color`, installable. **Done when:** "Add to Home Screen" works on your phone and opens full-screen.
 
 ## Phase 1 — Recall
