@@ -5,8 +5,8 @@ import { publicEnv } from "@/lib/env";
 // Server-side client for Server Components, Route Handlers and Server Actions.
 // Still the publishable key: RLS decides what this user may read. The secret key is never used here.
 export async function supabaseServer() {
+  const store = await cookies();   // first: touching cookies marks the route dynamic, so env is read at request time
   const env = publicEnv();
-  const store = await cookies();
   return createServerClient(env.NEXT_PUBLIC_SUPABASE_URL, env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll: () => store.getAll(),

@@ -3,6 +3,7 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
 
 // Placeholder for the Recall "Today" page (task 1.4). For 0.4 it proves the session reaches a server component.
+export const dynamic = "force-dynamic";   // never prerendered: it depends on the session cookie and runtime env
 export default async function Today() {
   const supabase = await supabaseServer();
   const { data } = await supabase.auth.getUser();
