@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { publicEnv } from "@/lib/env";
-import { redirectFor } from "@/lib/auth/routes";
+import { isProtected, INVITE_PATH, SIGN_IN_PATH, redirectFor } from "@/lib/auth/routes";
 
 // Refreshes the Supabase session cookie on every request and applies the routing rules in lib/auth/routes.
 export async function middleware(request: NextRequest) {
@@ -35,7 +35,14 @@ export async function middleware(request: NextRequest) {
   }
   // getUser() validates the JWT with Supabase; getSession() would trust the cookie blindly.
   const { data } = await supabase.auth.getUser();
-  const to = redirectFor(request.nextUrl.pathname, !!data.user);
+  const path = request.nextUrl.pathname;
+  // The invite flag is only read on pages the gate applies to: one indexed row, under RLS.
+  let invited = true;
+  if (data.user && (isProtected(path) || path === INVITE_PATH || path === SIGN_IN_PATH)) {
+    const { data: row } = await supabase.from("users").select("invited").eq("id", data.user.id).maybeSingle();
+    invited = row?.invited === true;
+  }
+  const to = redirectFor(path, { signedIn: !!data.user, invited });
   if (to) return NextResponse.redirect(new URL(to, request.url));
   return response;
 }

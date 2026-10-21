@@ -3,6 +3,25 @@ title = "better-every-day-v2"
 [extend]
 useDefault = true
 
+# Keys this project could plausibly leak, on top of gitleaks' defaults.
+[[rules]]
+id = "anthropic-api-key"
+description = "Anthropic API key"
+regex = '''sk-ant-[A-Za-z0-9_\-]{20,}'''
+tags = ["key", "anthropic"]
+
+[[rules]]
+id = "supabase-secret-key"
+description = "Supabase secret (service role) key, new format"
+regex = '''sb_secret_[A-Za-z0-9_\-]{16,}'''
+tags = ["key", "supabase"]
+
+[[rules]]
+id = "google-ai-key"
+description = "Google AI / Gemini API key"
+regex = '''AIza[0-9A-Za-z_\-]{35}'''
+tags = ["key", "google"]
+
 [allowlist]
 description = "Placeholders and public, non-secret identifiers"
 regexes = [
