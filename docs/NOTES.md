@@ -5,3 +5,5 @@
 - 2026-10-21: a transient `npm ci` ECONNRESET in CI is a re-run, not a bug.
 - 2026-10-21: NEXT_PUBLIC_* only reach the browser when referenced literally as `process.env.NAME`; reading them through a `process.env` object works on the server and is `undefined` on the client (the sign-in button threw a ZodError). `src/lib/env.ts` spells them out.
 - 2026-10-21: the production URL is https://better-every-day-v2-neon.vercel.app (better-every-day-v2.vercel.app belongs to someone else). Update the GitHub OAuth app homepage and Supabase Site URL to the -neon one.
+- 2026-10-21: Supabase redirect allow-list entries must match the WHOLE redirect URL including the query string. `https://*.vercel.app/auth/callback` did not match `.../auth/callback?next=%2Ftoday`, so Supabase fell back to the Site URL and the session never formed. The entry is now `https://*.vercel.app/auth/callback**`, and middleware forwards a stray `?code=` to the callback as a safety net.
+- 2026-10-21: "Unable to exchange external code" from Supabase = the provider Client Secret does not match. Regenerate on the provider, paste again.
