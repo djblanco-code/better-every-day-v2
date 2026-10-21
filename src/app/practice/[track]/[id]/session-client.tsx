@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { saveDraft } from "./actions";
+import { assess } from "./grade";
 import type { Statement } from "@/lib/recall/statement";
 import type { Track } from "@/lib/recall/types";
 
@@ -18,6 +20,8 @@ export function SessionClient(props: {
   const [now, setNow] = useState(Date.now());
   const [saved, setSaved] = useState<"saved" | "saving" | "unsaved" | "error">("saved");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [grading, setGrading] = useState<string | null>(null);
+  const router = useRouter();
 
   // tick the clock once a second only while running
   useEffect(() => { if (startedAt == null) return; const id = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(id); }, [startedAt]);
@@ -75,7 +79,19 @@ export function SessionClient(props: {
       </article>
 
       <div className="mx-auto flex w-full max-w-[860px] flex-wrap items-center gap-3 text-sm">
-        <button disabled className="h-10 rounded-lg bg-neutral-900 px-4 font-medium text-white opacity-50" title="Grading arrives in task 1.8">Submit for grading</button>
+        <button
+          disabled={grading === "…" || text.trim().length < 20}
+          onClick={async () => {
+            if (timer.current) clearTimeout(timer.current);
+            setGrading("…");
+            const used = startedAt == null ? 0 : Math.round(((Date.now() - startedAt) / 60000) * 10) / 10;
+            const d = new Date(); const local = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+            try { const r = await assess({ track, id: item.id, answer: text, minutes_used: used, timer_minutes: mins, clientDate: local }); router.push(`/history/${r.session_id}`); }
+            catch (e) { setGrading(String((e as Error)?.message ?? e)); }
+          }}
+          className="h-10 rounded-lg bg-neutral-900 px-4 font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
+        >{grading === "…" ? "Grading…" : "Submit for grading"}</button>
+        {grading && grading !== "…" ? <span className="text-red-700">{grading}</span> : null}
         <span className="text-neutral-500">{text.length} chars · {saved === "saved" ? "saved" : saved === "saving" ? "saving…" : saved === "error" ? "not saved (offline?)" : "unsaved"}</span>
       </div>
     </main>
