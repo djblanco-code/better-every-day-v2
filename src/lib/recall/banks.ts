@@ -5,12 +5,12 @@ import { TRACKS } from "./types";
 
 // Shared, read-only banks from public.banks, cached in memory for the server process. The `_meta` row per track
 // carries bank-level data (categories, company lists, program settings). Shapes match supabase/seed/*.json.
-let cache: { at: number; banks: Banks; cur: Curriculum; premium: Record<string, string> } | null = null;
+let cache: { at: number; banks: Banks; cur: Curriculum; premium: Record<string, string>; statements: Record<string, string> } | null = null;
 const TTL = 10 * 60 * 1000;
 
 type Row = { track: string; item_id: string; data: Record<string, unknown> };
 
-export async function loadBanks(supabase: SupabaseClient): Promise<{ banks: Banks; cur: Curriculum; premium: Record<string, string> }> {
+export async function loadBanks(supabase: SupabaseClient): Promise<{ banks: Banks; cur: Curriculum; premium: Record<string, string>; statements: Record<string, string> }> {
   if (cache && Date.now() - cache.at < TTL) return cache;
   const { data, error } = await supabase.from("banks").select("track,item_id,data").limit(5000);
   if (error) throw new Error("banks: " + error.message);
@@ -27,7 +27,9 @@ export async function loadBanks(supabase: SupabaseClient): Promise<{ banks: Bank
   const weeks = by("curriculum").filter((r) => r.item_id !== "_meta").map((r) => r.data as unknown as Curriculum["weeks"][number]).sort((a, b) => a.week - b.week);
   const cur: Curriculum = { weeks, daily_minutes: cmeta.daily_minutes as number | undefined, program_weeks: cmeta.program_weeks as number | undefined, principles: cmeta.principles as [string, string][] | undefined };
   const premium = Object.fromEntries(by("premium_statements").map((r) => [r.item_id, String((r.data as { text: string }).text)]));
-  cache = { at: Date.now(), banks, cur, premium };
+  // LeetCode statements from the open dataset, loaded per deployment by scripts/fetch-statements.mjs (track "statement")
+  const statements = Object.fromEntries(by("statement").map((r) => [r.item_id, String((r.data as { text: string }).text)]));
+  cache = { at: Date.now(), banks, cur, premium, statements };
   return cache;
 }
 

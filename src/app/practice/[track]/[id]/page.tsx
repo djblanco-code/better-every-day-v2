@@ -15,14 +15,14 @@ export default async function Session({ params }: { params: Promise<{ track: str
   const supabase = await supabaseServer();
   const { data } = await supabase.auth.getUser();
   if (!data.user) redirect(SIGN_IN_PATH);
-  const { banks, premium } = await loadBanks(supabase);
+  const { banks, premium, statements } = await loadBanks(supabase);
   const item = findItem(banks, track as Track, decodeURIComponent(id));
   if (!item) notFound();
   const [{ data: draft }, { data: prog }] = await Promise.all([
     supabase.from("drafts").select("text,started_at").eq("track", track).eq("item_id", item.id).maybeSingle(),
     supabase.from("progress").select("attempts,best").eq("track", track).eq("item_id", item.id).maybeSingle(),
   ]);
-  const statement = statementFor(track as Track, item, premium);
+  const statement = statementFor(track as Track, item, premium, statements[item.id] ?? null);
   return (
     <SessionClient
       track={track as Track}
