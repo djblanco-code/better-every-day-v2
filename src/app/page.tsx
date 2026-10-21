@@ -13,12 +13,20 @@ export default function Home() {
   }
   return (
     <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-4 px-6">
-      <p className="text-sm text-neutral-500">Task 0.3 · hello</p>
+      <p className="text-sm text-neutral-500">Hello</p>
       <h1 className="text-3xl font-semibold tracking-tight">Better Every Day</h1>
       {host ? (
-        <p className="text-neutral-600">
-          Deployed and configured. Supabase project: <code className="rounded bg-neutral-100 px-1">{host}</code>
-        </p>
+        <>
+          <p className="text-neutral-600">
+            Deployed and configured. Supabase project: <code className="rounded bg-neutral-100 px-1">{host}</code>
+          </p>
+          <a
+            href="/today"
+            className="inline-flex h-10 w-fit items-center rounded-lg bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-800"
+          >
+            Open the app
+          </a>
+        </>
       ) : (
         <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
           <p className="font-medium">Deployed, but not configured yet.</p>
