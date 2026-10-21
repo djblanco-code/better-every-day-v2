@@ -5,8 +5,8 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 
 ## Phase 0 — foundations (deploy on day 2)
 
-- [ ] 0.1 Create the Supabase project (free tier). Record project URL and anon key in `.env.local`; service key only in Vercel env. **Done when:** `supabase status` shows the project and `.env.example` lists every variable name with no values.
-- [ ] 0.2 `npx create-next-app@latest` (TypeScript, App Router, Tailwind, ESLint, src/ dir). Add `@supabase/ssr`, `zod`, `vitest`. **Done when:** `npm run build` and `npm test` pass on a hello page.
+- [x] 0.1 Create the Supabase project (free tier). Record project URL and anon key in `.env.local`; service key only in Vercel env. **Done when:** `supabase status` shows the project and `.env.example` lists every variable name with no values.
+- [x] 0.2 `npx create-next-app@latest` (TypeScript, App Router, Tailwind, ESLint, src/ dir). Add `@supabase/ssr`, `zod`, `vitest`. **Done when:** `npm run build` and `npm test` pass on a hello page.
 - [ ] 0.3 Push to GitHub `djblanco-code/better-every-day-v2`, connect Vercel, set env vars. **Done when:** the hello page is live on a `*.vercel.app` URL (day 2).
 - [ ] 0.4 Auth: Supabase Auth with Google and GitHub providers; sign-in page; middleware that redirects signed-out users. **Done when:** you can sign in with Google and with GitHub on the live URL; a signed-out visit to `/today` redirects.
 - [ ] 0.5 Invite gate: `INVITE_CODE` env var checked once at first sign-in, stored on `users`. **Done when:** a new account without the code is shown "invite only" and cannot reach `/today`.
