@@ -78,7 +78,7 @@ export function TodayClient({ email }: { email: string }) {
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
-  return <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-5 px-4 py-6 sm:px-6">{children}</main>;
+  return <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-5 bg-neutral-50 px-4 py-6 text-neutral-900 sm:px-6">{children}</main>;
 }
 function Stat({ label, value }: { label: string; value: string }) {
   return <div className="rounded-2xl border border-neutral-200 bg-white p-4"><p className="text-xs text-neutral-500">{label}</p><p className="mt-1 text-2xl font-semibold">{value}</p></div>;
