@@ -6,9 +6,14 @@ const PublicEnv = z.object({
   NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: z.string().min(10),
 });
 
-export function publicEnv(source: Record<string, string | undefined> = process.env) {
-  return PublicEnv.parse({
-    NEXT_PUBLIC_SUPABASE_URL: source.NEXT_PUBLIC_SUPABASE_URL,
-    NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: source.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-  });
+// Next.js inlines NEXT_PUBLIC_* into client bundles only when each one is written out as a literal
+// `process.env.NAME` expression. Indexing a `process.env` object does not get inlined (it is undefined in the
+// browser), so the defaults below must stay spelled out. `source` exists for tests.
+export function publicEnv(source?: Record<string, string | undefined>) {
+  return PublicEnv.parse(
+    source ?? {
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+    },
+  );
 }
