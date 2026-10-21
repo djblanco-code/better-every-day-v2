@@ -89,7 +89,7 @@ Goal: one hour a day, six months, with the same engine as v1 and a better UI.
 
 ## 5. Non-functional requirements
 - **Security**: keys only server-side; user keys in Supabase Vault; RLS on every table; allowlist is not
-  needed since each user only sees their own rows, but sign-ups can be gated by an invite code env var.
+  needed since each user only sees their own rows, but sign-ups are gated by an invite code stored in `private.config` and checked by a security-definer function (not an env var: nothing client-side can read or bypass it).
 - **Safety**: external content (email, postings, web) is untrusted data; prompt-injection boundary in every
   agent prompt; no autonomous side effects.
 - **Reliability**: model calls retried with backoff; structured outputs; grader/parser versions stamped.
