@@ -10,11 +10,21 @@ describe("auth routes", () => {
   });
   it("sends a signed-out visitor to sign-in with a return path", () => {
     expect(redirectFor("/today", false)).toBe("/sign-in?next=%2Ftoday");
+    expect(redirectFor("/invite", false)).toBe("/sign-in?next=%2Finvite");
     expect(redirectFor("/", false)).toBeNull();
   });
-  it("keeps a signed-in user off the sign-in page", () => {
+  it("keeps a signed-in, invited user off the sign-in and invite pages", () => {
     expect(redirectFor("/sign-in", true)).toBe("/today");
+    expect(redirectFor("/invite", { signedIn: true, invited: true })).toBe("/today");
     expect(redirectFor("/today", true)).toBeNull();
+  });
+  it("holds a signed-in but uninvited user at the invite page", () => {
+    const v = { signedIn: true, invited: false };
+    expect(redirectFor("/today", v)).toBe("/invite");
+    expect(redirectFor("/settings", v)).toBe("/invite");
+    expect(redirectFor("/invite", v)).toBeNull();
+    expect(redirectFor("/sign-in", v)).toBe("/invite");
+    expect(redirectFor("/", v)).toBeNull();
   });
   it("never redirects to another origin after sign-in", () => {
     expect(safeNext("https://evil.example")).toBe("/today");
