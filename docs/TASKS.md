@@ -16,7 +16,7 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 
 ## Phase 1 — Recall
 
-- [ ] 1.1 Seed data: copy v1 banks (`data/recall-*.json`, curriculum) into `supabase/seed/`, a `banks` table (shared, read-only via RLS) and a seed script. **Done when:** `select count(*) from banks` matches v1 item counts per track.
+- [x] 1.1 Seed data: copy v1 banks (`data/recall-*.json`, curriculum) into `supabase/seed/`, a `banks` table (shared, read-only via RLS) and a seed script. **Done when:** `select count(*) from banks` matches v1 item counts per track.
 - [ ] 1.2 Statements: script that fetches the open leetcode-problems dataset into Supabase Storage (private bucket) at deploy time. **Done when:** `two-sum` statement renders on staging; nothing from the dataset is committed.
 - [ ] 1.3 Port the engine to `src/lib/recall/`: `schedule`, `mastery`, `readiness`, `recommend`, `secondTrack`, `thirdSlot`, `buildPlan`, `metrics`. Pure functions over plain objects, no DB inside. **Done when:** golden test passes: 20 recorded v1 states (exported from `state/recall.json` snapshots) produce identical plans.
 - [ ] 1.4 Tables: `progress`, `sessions`, `plans`, `program`, `external_reps` with RLS. Server actions: `getToday`, `swapSlot`, `markDone`, `logMinutes`, `logRep`. **Done when:** Today page shows the plan for your account on staging and persists across reloads and devices.
