@@ -122,6 +122,11 @@ Billing, marketing site, offline sync, native apps, the ATS application agent (s
 any agent that acts without a click.
 
 ## 9. Open questions (answer before the task that needs them)
+
+Resolved 2026-10-21 by default (owner was asked three times and did not override; change any by editing
+the decisions table): (1) Google + GitHub first, LinkedIn when approved; (2) invite code required;
+(3) strictly bring-your-own key; (4) sign-in page name "Better Every Day".
+
 1. LinkedIn sign-in needs a LinkedIn developer app with "Sign In with LinkedIn using OpenID Connect";
    approval can take days. Ship Google + GitHub first and add LinkedIn when the app is approved? (default: yes)
 2. Invite code for sign-ups, or open sign-up with per-user budgets as the only limit? (default: invite code)
