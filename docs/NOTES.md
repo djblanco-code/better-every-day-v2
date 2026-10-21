@@ -3,3 +3,5 @@
 - 2026-10-21: `@supabase/supabase-js` 2.118 requires Node >= 22. CI and Vercel run Node 22; the dev machine still has Node 20.0.0 (works with EBADENGINE warnings). Upgrade local Node to 22 LTS when convenient: https://nodejs.org.
 - 2026-10-21: Vercel env vars are per environment. Add NEXT_PUBLIC_* to Production AND Preview, or PR previews run unconfigured (the hello page says so instead of failing the build).
 - 2026-10-21: a transient `npm ci` ECONNRESET in CI is a re-run, not a bug.
+- 2026-10-21: NEXT_PUBLIC_* only reach the browser when referenced literally as `process.env.NAME`; reading them through a `process.env` object works on the server and is `undefined` on the client (the sign-in button threw a ZodError). `src/lib/env.ts` spells them out.
+- 2026-10-21: the production URL is https://better-every-day-v2-neon.vercel.app (better-every-day-v2.vercel.app belongs to someone else). Update the GitHub OAuth app homepage and Supabase Site URL to the -neon one.
