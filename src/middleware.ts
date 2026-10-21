@@ -24,6 +24,15 @@ export async function middleware(request: NextRequest) {
       },
     },
   });
+  // An OAuth code that lands anywhere but the callback (Supabase falls back to the Site URL when the
+  // redirect is not on its allow list) is forwarded to the callback so the session still gets created.
+  const code = request.nextUrl.searchParams.get("code");
+  if (code && request.nextUrl.pathname !== "/auth/callback") {
+    const to = new URL("/auth/callback", request.url);
+    to.searchParams.set("code", code);
+    to.searchParams.set("next", request.nextUrl.searchParams.get("next") ?? "/today");
+    return NextResponse.redirect(to);
+  }
   // getUser() validates the JWT with Supabase; getSession() would trust the cookie blindly.
   const { data } = await supabase.auth.getUser();
   const to = redirectFor(request.nextUrl.pathname, !!data.user);
