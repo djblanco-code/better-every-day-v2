@@ -25,8 +25,8 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 1.7 Model gateway `src/lib/ai/`: `callModel(system, user, schema)` with provider switch, temperature 0, schema enforcement (Claude tool use / Gemini responseSchema), retries, budget check before the call, audit row after. **Done when:** a unit test with a fake transport verifies the request shape and the audit row; a budget of $0 blocks the call with a clear message.
 - [x] 1.8 Grading: port the graders (general + debugging) with bands and versions; result page with ring, sub-scores, strengths, gaps, outline. **Done when:** one real graded session on staging costs < $0.05 (visible in the audit row).
 - [x] 1.9 Program page: week N of 26, reading/homework checklists, mastery per category, readiness over time, adherence, under-time rate, score trend. **Done when:** numbers match v1 for your imported history.
-- [ ] 1.10 Import from v1: one-off script reading `state/recall.json` into your account. **Done when:** streak, sessions and readiness match v1 on the day of import.
-- [ ] 1.11 Practice page: filters (track, difficulty, topic, list, company), "start next", random. Company focus setting + `company_list` import script. **Done when:** choosing Google as focus changes tomorrow's first slot the same way v1 does.
+- [x] 1.10 Import from v1: one-off script reading `state/recall.json` into your account. **Done when:** streak, sessions and readiness match v1 on the day of import.
+- [x] 1.11 Practice page: filters (track, difficulty, topic, list, company), "start next", random. Company focus setting + `company_list` import script. **Done when:** choosing Google as focus changes tomorrow's first slot the same way v1 does.
 - [ ] 1.12 Switch over: use v2 Recall for 7 days; log every gap in `docs/GAPS.md`. **Done when:** you no longer open v1's Recall.
 
 ## Phase 2 — Journal, Memory agent, Chat
