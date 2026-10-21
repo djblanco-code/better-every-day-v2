@@ -29,7 +29,7 @@ const { banks, cur } = loadBanks();
 const clone = <T,>(x: T): T => JSON.parse(JSON.stringify(x));
 
 describe("recall engine matches v1 golden outputs", () => {
-  for (const g of golden as Array<{ case: number; today: string; state: RecallState; expected: Record<string, unknown> }>) {
+  for (const g of golden as unknown as Array<{ case: number; today: string; state: RecallState; expected: Record<string, unknown> }>) {
     const st = g.state;
     const e = g.expected as {
       recommend: Record<Track, unknown>; second_track: [string, string]; third_slot: unknown; plan: unknown;
