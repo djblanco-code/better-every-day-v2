@@ -19,9 +19,25 @@ time. It exists so code is generated incrementally and every change is traceable
 9. **Deploy to staging** (push the branch; Vercel builds a preview URL). Verify the task's "Done when" **on
    that URL**, not locally.
 10. **Commit** with the task number first: `1.3 port recall engine with golden test`. Tick the box in
-    `TASKS.md` in the same commit. Open a PR; CI must be green; merge to `main` → production deploy.
+    `TASKS.md` in the same commit. Open a PR (see "Pull requests" below); CI must be green; squash-merge to
+    `main` → production deploy.
 11. **Record**: if anything was learned that the next person needs (a Supabase quirk, a Vercel runtime
     gotcha), add one line to `docs/NOTES.md`. If a gap in the PRD was found, add it to PRD section 9.
+
+## Pull requests (the only way code reaches `main`)
+
+1. **Branch name** `task/<number>-<slug>`, e.g. `task/0.4-auth`. Branched from an up-to-date `main`.
+2. **PR title** = the task line: `0.4 Auth: Supabase Auth with Google and GitHub`. One task per PR; a PR
+   that grows past its task is split before review.
+3. **PR body** = the template (`.github/pull_request_template.md`): task, PRD section, why, the task's
+   "Done when" ticked only after checking it on the Vercel **preview URL** the PR gets automatically.
+4. **CI must be green**: lint, typecheck, vitest, production build, gitleaks secret scan (`.github/workflows/ci.yml`).
+5. **Review**: read the diff top to bottom once as a reviewer, not the author. For AI-written code, the
+   reviewer is the human; the checklist in the template is the minimum.
+6. **Squash-merge** so `main` has one commit per task, titled with the task number. Delete the branch.
+7. **Branch protection on `main`** (GitHub → Settings → Branches): require a PR, require the `CI` checks,
+   no force-push, no direct push. Set once, by the owner.
+8. **Production = `main`**. A bad merge is reverted with a revert PR, never fixed with a direct push.
 
 ## Hard rules
 - No secrets in any file that is committed. `.env.example` lists names only. CI runs gitleaks.
