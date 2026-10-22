@@ -1,4 +1,6 @@
 "use server";
+import { z } from "zod";
+import { id as idS, minutes as minutesS, parse, rating as ratingS, shortText } from "@/lib/validate";
 import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabase/server";
 import { loadBanks } from "@/lib/recall/banks";
@@ -44,6 +46,7 @@ export async function getToday(clientDate?: string): Promise<TodayData> {
 
 /** Replace one practice slot's problem with the next recommendation, excluding what was there. */
 export async function swapSlot(n: number, clientDate?: string): Promise<TodayData> {
+  n = parse(z.number().int().min(0).max(5), n);
   const c = await ctx(clientDate);
   const plan = c.st.plans[c.today];
   if (!plan) return getToday(clientDate);
@@ -61,6 +64,7 @@ export async function swapSlot(n: number, clientDate?: string): Promise<TodayDat
 
 /** Tick (or untick) a reading/homework item; its minutes count toward today. */
 export async function markDone(id: string, minutes: number, undo = false, clientDate?: string): Promise<TodayData> {
+  id = parse(idS, id); minutes = parse(minutesS, minutes || 0);
   const c = await ctx(clientDate);
   const done = { ...(c.st.program.done ?? {}) };
   const mins = { ...(c.st.program.minutes ?? {}) };
@@ -81,6 +85,7 @@ export async function markDone(id: string, minutes: number, undo = false, client
 
 /** Extra study minutes outside a graded session. */
 export async function logMinutes(minutes: number, clientDate?: string): Promise<TodayData> {
+  minutes = parse(minutesS.min(1), minutes);
   const c = await ctx(clientDate);
   const m = Math.max(1, Math.min(300, Math.trunc(minutes || 0)));
   const mins = { ...(c.st.program.minutes ?? {}) };
@@ -94,6 +99,7 @@ export async function logMinutes(minutes: number, clientDate?: string): Promise<
 
 /** A mock or real interview done outside the app. Counts toward minutes, streak and metrics. */
 export async function logRep(input: { kind: "mock_interview" | "interview" | "study"; with_who?: string; format?: string; rating?: number | null; minutes?: number | null }, clientDate?: string): Promise<TodayData> {
+  input = parse(z.object({ kind: z.enum(["mock_interview", "interview", "study"]), with_who: shortText(120).optional(), format: shortText(60).optional(), rating: ratingS.optional(), minutes: minutesS.nullable().optional() }), input);
   const c = await ctx(clientDate);
   const id = `${c.today}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
   const rating = input.rating == null ? null : Math.max(1, Math.min(10, Math.trunc(input.rating)));

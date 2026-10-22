@@ -1,4 +1,6 @@
 "use server";
+import { z } from "zod";
+import { id as idS, isoDate, longText, parse, shortText } from "@/lib/validate";
 import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabase/server";
 import { newId } from "@/lib/jobs/store";
@@ -26,6 +28,7 @@ export async function getNetwork(): Promise<NetworkState> {
 
 export async function savePerson(rec: Partial<Person>): Promise<{ ok: true }> {
   const { supabase, uid } = await ctx();
+  rec = parse(z.object({ id: idS.optional(), entry_id: idS.nullable().optional(), date: isoDate.nullable().optional(), name: shortText(120).min(1, "name is required"), company: shortText(120).optional(), role: shortText(120).optional(), relationship: z.enum(["contact", "mentor", "recruiter", "peer"]).optional(), met_at: shortText(160).optional(), how_they_can_help: shortText(300).optional(), follow_up: shortText(300).optional(), follow_up_done: z.boolean().optional(), email: shortText(160).optional(), linkedin: shortText(300).optional(), notes: longText(4000).optional() }), { ...rec, id: rec.id || undefined, date: rec.date || null });
   if (!(rec.name ?? "").trim()) throw new Error("Name is required");
   const row = { id: rec.id || newId(), user_id: uid, entry_id: rec.entry_id ?? null, date: rec.date || new Date().toISOString().slice(0, 10), name: rec.name!.trim().slice(0, 120), company: (rec.company ?? "").slice(0, 120), role: (rec.role ?? "").slice(0, 120), relationship: rec.relationship ?? "contact", met_at: (rec.met_at ?? "").slice(0, 160), how_they_can_help: (rec.how_they_can_help ?? "").slice(0, 300), follow_up: (rec.follow_up ?? "").slice(0, 300), follow_up_done: !!rec.follow_up_done, email: (rec.email ?? "").slice(0, 160), linkedin: (rec.linkedin ?? "").slice(0, 300), notes: (rec.notes ?? "").slice(0, 4000) };
   const { error } = await supabase.from("people").upsert(row, { onConflict: "user_id,id" });
@@ -36,6 +39,7 @@ export async function savePerson(rec: Partial<Person>): Promise<{ ok: true }> {
 
 export async function saveEvent(rec: Partial<Event>): Promise<{ ok: true }> {
   const { supabase, uid } = await ctx();
+  rec = parse(z.object({ id: idS.optional(), entry_id: idS.nullable().optional(), date: isoDate.nullable().optional(), name: shortText(160).min(1, "event name is required"), kind: shortText(40).optional(), org: shortText(160).optional(), notes: longText(4000).optional() }), { ...rec, id: rec.id || undefined, date: rec.date || null });
   if (!(rec.name ?? "").trim()) throw new Error("Event name is required");
   const row = { id: rec.id || newId(), user_id: uid, entry_id: rec.entry_id ?? null, date: rec.date || new Date().toISOString().slice(0, 10), name: rec.name!.trim().slice(0, 160), kind: rec.kind ?? "other", org: (rec.org ?? "").slice(0, 160), notes: (rec.notes ?? "").slice(0, 4000) };
   const { error } = await supabase.from("events").upsert(row, { onConflict: "user_id,id" });
@@ -46,6 +50,7 @@ export async function saveEvent(rec: Partial<Event>): Promise<{ ok: true }> {
 
 export async function removeNetwork(kind: "person" | "event", id: string): Promise<{ ok: true }> {
   const { supabase } = await ctx();
+  kind = parse(z.enum(["person", "event"]), kind); id = parse(idS, id);
   const { error } = await supabase.from(kind === "person" ? "people" : "events").delete().eq("id", id);
   if (error) throw new Error(error.message);
   bump();

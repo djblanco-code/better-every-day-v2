@@ -1,4 +1,6 @@
 "use server";
+import { z } from "zod";
+import { id as idS, isoDate, longText, parse, track as trackS } from "@/lib/validate";
 import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabase/server";
 import { callModel } from "@/lib/ai/callModel";
@@ -13,6 +15,7 @@ const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
 /** Grade what the user wrote (nothing is executed), store the session, reschedule the item, clear the draft. */
 export async function assess(input: { track: string; id: string; answer: string; minutes_used: number; timer_minutes: number; clientDate?: string }): Promise<{ session_id: string }> {
+  input = parse(z.object({ track: trackS, id: idS, answer: longText(12000), minutes_used: z.number().min(0).max(600), timer_minutes: z.number().int().min(1).max(120), clientDate: isoDate.optional() }), input);
   const track = input.track as Track;
   if (!(TRACKS as string[]).includes(track)) throw new Error("bad track");
   const supabase = await supabaseServer();
