@@ -90,4 +90,4 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 9.1 Schema: goals, goal_profile, day_plans (migration 0012, RLS, applied live).
 - [x] 9.2 Goals questionnaire (`/goals`): seven questions, WOOP shape, editable; the list it produces.
 - [x] 9.3 Daily plan ritual on Home: the questionnaire owns the page (time, goal for today, energy, then the check-in: sleep, mood, exercise), "Making today's plan…" for a beat, then the plan; one line with Change afterwards; the separate check-in card is gone from Home (it lives in Life).
-- [ ] 9.4 Lead the page with the focus goal's items (job → Pipeline due items; network → follow-ups; health → habits) and show the if-then plan on low-energy days.
+- [x] 9.4 One daily question (time); goals fixed; "what is possible" = the hour's slots that fit, then the goals' items with the minutes left; Home shows the next slot that fits, a one-sentence Today line, a collapsed "+ Add an update" line. Decided with the owner as PM/UX/HCI (session 2026-10-22).
