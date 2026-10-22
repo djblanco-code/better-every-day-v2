@@ -59,7 +59,7 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 5.1 RLS: wrap `auth.uid()` in a subselect in every policy (initPlan, ~95% faster policy checks).
 - [x] 5.2 Index every policy column that is not already a key (verified: all covered; proof query in migration 0008).
 - [x] 5.3 Local JWT verification (`getClaims()`) for page guards; `getUser()` only where revocation must be immediate.
-- [ ] 5.4 One RPC per page: `get_jobs_state` replaces the N queries behind the Jobs pages.
+- [x] 5.4 One RPC per page: `get_jobs_state` replaces the N queries behind the Jobs pages.
 - [ ] 5.5 Keep the free database awake: daily Vercel cron pings a health route that touches Postgres.
 - [ ] 5.6 Real-user Core Web Vitals (Speed Insights) with the 75th-percentile targets: LCP 2.5 s, INP 200 ms, CLS 0.1.
 - [ ] 5.7 RLS isolation test runs in CI against a throwaway local Supabase (Docker), no secrets needed.
