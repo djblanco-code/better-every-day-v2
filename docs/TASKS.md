@@ -50,5 +50,5 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [ ] 4.4 LinkedIn sign-in once the developer app is approved.
 - [x] 4.5 `npm audit fix` and pin; scheduled weekly CI run of gitleaks + audit. (from docs/ASSESSMENT.md)
 - [x] 4.6 zod-validate every server-action input; per-user rate limit on model-calling actions.
-- [ ] 4.7 Lighthouse in CI (`@lhci/cli`) with budgets; anything under 90 on mobile gets fixed.
+- [x] 4.7 Lighthouse in CI (`@lhci/cli`) with budgets; anything under 90 on mobile gets fixed.
 - [ ] 4.8 Dialog focus trap + `aria-live` status messages; axe-core smoke test on the main pages.
