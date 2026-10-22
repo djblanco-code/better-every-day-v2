@@ -1,4 +1,5 @@
 "use client";
+import { Shell } from "../shell";
 import { useEffect, useState, useTransition } from "react";
 import { getToday, logMinutes, markDone, swapSlot, type TodayData } from "./actions";
 import type { SlotView } from "@/lib/recall/plan";
@@ -56,12 +57,13 @@ export function TodayClient({ email }: { email: string }) {
         </div>
       </section>
 
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)]">
       <section className="space-y-3">
         <h2 className="text-sm font-medium uppercase tracking-wide text-neutral-500">The plan · fixed for today</h2>
         {plan.slots.map((s, i) => <SlotCard key={i} i={i} s={s} pending={pending} onSwap={() => run(() => swapSlot(i, localDate()))} onDone={(m) => run(() => markDone((s as { id: string }).id, m, false, localDate()))} onUndo={() => run(() => markDone((s as { id: string }).id, 0, true, localDate()))} />)}
       </section>
 
-      <section className="rounded-2xl border border-neutral-200 bg-white p-5">
+      <section className="h-fit rounded-2xl border border-neutral-200 bg-white p-5 lg:sticky lg:top-16">
         <h2 className="font-medium">Readiness by track</h2>
         <p className="text-sm text-neutral-500">70% coverage of problems you scored 8+ on, 30% your last ten scores</p>
         <div className="mt-3 space-y-2">
@@ -73,13 +75,11 @@ export function TodayClient({ email }: { email: string }) {
           ))}
         </div>
       </section>
+      </div>
     </Shell>
   );
 }
 
-function Shell({ children }: { children: React.ReactNode }) {
-  return <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-5 bg-neutral-50 px-4 py-6 text-neutral-900 sm:px-6">{children}</main>;
-}
 function Stat({ label, value }: { label: string; value: string }) {
   return <div className="rounded-2xl border border-neutral-200 bg-white p-4"><p className="text-xs text-neutral-500">{label}</p><p className="mt-1 text-2xl font-semibold">{value}</p></div>;
 }
