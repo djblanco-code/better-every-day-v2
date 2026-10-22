@@ -210,3 +210,13 @@ export async function logRep(input: { kind: "mock_interview" | "interview" | "st
   revalidatePath("/today");
   return getToday(clientDate);
 }
+
+/** "Change": forget today's answers so the ritual asks again. */
+export async function clearDayPlan(clientDate?: string): Promise<TodayData> {
+  const c = await ctx(clientDate);
+  const { error } = await c.supabase.from("day_plans").delete().eq("day", planningDay());
+  if (error) throw new Error(error.message);
+  revalidatePath("/");
+  const plan = c.st.plans[c.today] ?? buildPlan(c.st, c.banks, c.cur, c.today);
+  return out(c, plan);
+}

@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Shell } from "../shell";
 import { useEffect, useState, useTransition } from "react";
-import { getToday, logMinutes, makeDayPlan, markDone, setTimeAvailable, swapSlot, tickHabit, type TodayData } from "./actions";
+import { clearDayPlan, getToday, logMinutes, makeDayPlan, markDone, setTimeAvailable, swapSlot, tickHabit, type TodayData } from "./actions";
 import { DayPlanCard } from "./day-plan-card";
 import { areaLabel } from "@/lib/goals/types";
 import { CheckinForm } from "../life/checkin-form";
@@ -77,14 +77,14 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
       {day.day_plan ? (
         <section className="rise rise-2 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm">
           <p><span className="font-medium">Today:</span> {day.day_plan.time_available} min{focus ? <> · for <span className="font-medium">{focus.title}</span> <span className="text-neutral-500">({areaLabel(focus.area)})</span></> : day.goals.length ? "" : <> · <Link href="/goals" className="underline">set your goals</Link></>}{day.day_plan.energy ? ` · energy ${ENERGY[day.day_plan.energy].toLowerCase()}` : ""}</p>
-          <button className="text-neutral-600 hover:underline" onClick={() => run(async () => { await makeDayPlan({ time_available: 0, focus_goal_id: null, energy: null }, localDate()); return getToday(localDate()); })}>Change</button>
+          <button className="text-neutral-600 hover:underline" onClick={() => run(() => clearDayPlan(localDate()))}>Change</button>
         </section>
       ) : (
         <DayPlanCard goals={day.goals} pending={pending} defaultTime={budget ?? 60} onDone={(v) => run(() => makeDayPlan(v, localDate()))} />
       )}
 
-      {/* Morning: check in. Evening: it folds to one line. */}
-      <section className={`rise rise-2 rounded-2xl border bg-white p-4 sm:p-5 ${checkinOpen ? "border-accent/40" : "border-neutral-200"}`}>
+      {/* Morning: check in. Evening: it folds to one line. Hidden while the daily plan is still being asked (it asks the same things). */}
+      {day.day_plan || checkedIn ? <section className={`rise rise-2 rounded-2xl border bg-white p-4 sm:p-5 ${checkinOpen ? "border-accent/40" : "border-neutral-200"}`}>
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <h2 className="font-medium">{checkedIn ? "Checked in" : morning ? "How did you sleep?" : "How are you today?"}</h2>
@@ -98,7 +98,7 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
         </div>
         {checkinOpen ? <div className="mt-4 border-t border-neutral-100 pt-4"><CheckinForm key={JSON.stringify(ck)} today={data.today} current={ck} compact onSaved={() => { setShowCheckin(false); run(() => getToday(localDate())); }} /></div> : null}
         {lowEnergy ? <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">Low-energy day. The hour is sized to 40 minutes with the review first. Pick a time above to change that.</p> : null}
-      </section>
+      </section> : null}
 
       {/* The plan. Done → it folds to one line. */}
       <section className="rise rise-3 space-y-3">
