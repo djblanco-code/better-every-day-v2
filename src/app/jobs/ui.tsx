@@ -22,7 +22,7 @@ export function Card({ title, sub, right, children, className = "" }: { title?: 
   return <section className={`rounded-2xl border border-neutral-200 bg-white p-5 ${className}`}>{title ? <div className="mb-3 flex items-start justify-between gap-3"><div><h2 className="font-medium">{title}</h2>{sub ? <p className="text-xs text-neutral-500">{sub}</p> : null}</div>{right}</div> : null}{children}</section>;
 }
 export function JobsNav({ active }: { active: "pipeline" | "board" | "todo" | "mail" | "insights" | "action" }) {
-  const tabs: [typeof active, string, string][] = [["pipeline", "Pipeline", "/jobs"], ["board", "Board", "/jobs/board"], ["todo", "Leads", "/jobs/todo"], ["mail", "Mail", "/jobs/mail"], ["insights", "Insights", "/jobs/insights"]];
+  const tabs: [typeof active, string, string][] = [["insights", "Insights", "/jobs"], ["pipeline", "Pipeline", "/jobs/pipeline"], ["board", "Board", "/jobs/board"], ["todo", "Leads", "/jobs/todo"], ["mail", "Mail", "/jobs/mail"]];
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
       <div><Link href="/" className="text-sm text-neutral-600 hover:underline">← Home</Link><h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Job Tracker</h1></div>
