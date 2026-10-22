@@ -1,11 +1,16 @@
-# Status after the third build night (2026-10-22)
+# Status after the Phase 5 review (2026-10-22)
 
-Everything in Phases 0-3 that does not need the owner's accounts is built, merged and live (24 PRs, CI green on each).
+Everything in Phases 0-3 that does not need the owner's accounts is built, merged and live (31 PRs, CI green on each).
 
 New since the last status: the app is now phone-first on the web (bottom tab bar on phones, top bar on wide screens,
 tables become cards under 768px, 16px inputs so iPhone does not zoom, safe-area padding, an Add-to-Home-Screen nudge
 on the second phone visit), a per-minute AI rate limit (10 calls/user/min) on top of the monthly budget, and Next 16
 (production `npm audit` is now 0). Research and sources: docs/NOTES.md, 2026-10-22 entries.
+
+Phase 5 (system-design review, docs/ASSESSMENT.md §7): RLS policies evaluate `auth.uid()` once per statement, sessions
+verify locally (no Auth round trip per page), the Jobs pages load in one RPC, a daily cron keeps the free database
+awake, Speed Insights records real-user Core Web Vitals, and CI proves row isolation on every PR against a throwaway
+local Supabase.
 
 Live: https://better-every-day-v2-neon.vercel.app (GitHub sign-in; invite code required once).
 
