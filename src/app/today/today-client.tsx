@@ -89,7 +89,7 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
   const habitsDone = day.habits.filter((h) => h.done).length;
   const todayLine = [
     `${budget} min today`,
-    plan.complete ? "the hour is done" : nextSlot ? `next: ${nextSlot.title ?? "the next slot"} (${nextSlot.minutes} min)` : fit.fits.some(Boolean) ? "the hour is done" : "no slot fits; log minutes below",
+    plan.complete ? "the hour is done" : nextSlot ? `next: ${nextSlot.title ?? "the next slot"} (${nextSlot.minutes} min${fit.over ? ", a little over" : ""})` : "the hour is done",
     possible.length ? `then ${possible.map((p) => p.label.toLowerCase()).slice(0, 2).join(" and ")}` : null,
   ].filter(Boolean).join(" · ");
 
@@ -161,14 +161,22 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
   );
 }
 
-function fitSlots(plan: PlanView, budget: number): { fits: boolean[]; used: number } {
+function fitSlots(plan: PlanView, budget: number): { fits: boolean[]; used: number; over: boolean } {
   let used = 0; const fits: boolean[] = [];
   for (const s of plan.slots) {
     if (s.done) { fits.push(true); used += s.minutes ?? 0; continue; }
     const m = s.minutes ?? 0;
     if (used + m <= budget) { fits.push(true); used += m; } else fits.push(false);
   }
-  return { fits, used: Math.min(used, budget) };
+  // A short day still gets one slot: the shortest open one, a little over budget, rather than nothing.
+  const anyOpenFits = plan.slots.some((s, i) => !s.done && fits[i]);
+  let over = false;
+  if (!anyOpenFits) {
+    let best = -1;
+    plan.slots.forEach((s, i) => { if (!s.done && (best < 0 || (s.minutes ?? 0) < (plan.slots[best].minutes ?? 0))) best = i; });
+    if (best >= 0) { fits[best] = true; used += plan.slots[best].minutes ?? 0; over = true; }
+  }
+  return { fits, used: Math.min(used, budget), over };
 }
 
 function UpdatesLine({ onSaved, evening }: { onSaved: () => void; evening: boolean }) {
