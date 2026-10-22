@@ -48,7 +48,7 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [ ] 4.2 Backups: weekly `pg_dump` to your own storage; restore drill once.
 - [ ] 4.3 Onboard two friends with their own keys; isolation test in CI.
 - [ ] 4.4 LinkedIn sign-in once the developer app is approved.
-- [ ] 4.5 `npm audit fix` and pin; scheduled weekly CI run of gitleaks + audit. (from docs/ASSESSMENT.md)
+- [x] 4.5 `npm audit fix` and pin; scheduled weekly CI run of gitleaks + audit. (from docs/ASSESSMENT.md)
 - [ ] 4.6 zod-validate every server-action input; per-user rate limit on model-calling actions.
 - [ ] 4.7 Lighthouse in CI (`@lhci/cli`) with budgets; anything under 90 on mobile gets fixed.
 - [ ] 4.8 Dialog focus trap + `aria-live` status messages; axe-core smoke test on the main pages.
