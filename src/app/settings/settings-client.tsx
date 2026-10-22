@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Shell } from "../shell";
+import { MailSettings } from "./mail-settings";
 import { useState, useTransition } from "react";
 import { clearKey, saveSettings, testKey, type SettingsView } from "./actions";
 
@@ -53,6 +54,7 @@ export function SettingsClient({ initial }: { initial: SettingsView }) {
         {s.key_hint ? <button disabled={pending} onClick={remove} className="h-10 rounded-lg px-3 text-sm text-red-700 hover:bg-red-50">Remove key</button> : null}
         {msg ? <span role="status" aria-live="polite" className="text-sm text-neutral-600">{msg}</span> : null}
       </div>
+      <MailSettings />
       </div>
 
       <aside className="space-y-5 lg:sticky lg:top-16 lg:h-fit">

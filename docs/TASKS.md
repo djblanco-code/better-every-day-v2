@@ -72,3 +72,8 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 6.3 Today = your day: check-in, needs-you-today, plan trimmed to time available, habits row, glance panel.
 - [x] 6.5 One home: the day view IS the home page (`/`); the journal card lives at the end of it; `/today` redirects; nav is Home, Jobs, Network, Life, Settings.
 - [x] 6.4 Journal parses expenses, health and existing habits into Life (parser v3).
+
+## Phase 7 — Job Tracker that drives action (docs/JOBS-UX.md)
+- [x] 7.1 Pipeline landing page: needs-you list (dated next actions, assessments, calls), gone-quiet list with Nudge / No reply, stage chips + table; next action + date on every application; inline "new search"; `/jobs/all` folded in; Insights holds the charts.
+- [x] 7.2 Mail: Gmail app password in the Vault (Settings), IMAP check of the last 14 days, rule-based classification, suggestions you confirm (`/jobs/mail`).
+- [ ] 7.3 Daily mail check from the cron once the owner has set it up and the first manual checks look right.
