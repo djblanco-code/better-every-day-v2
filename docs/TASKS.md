@@ -30,7 +30,7 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [ ] 1.12 Switch over: use v2 Recall for 7 days; log every gap in `docs/GAPS.md`. **Done when:** you no longer open v1's Recall.
 
 ## Phase 2 — Journal, Memory agent, Chat
-- [ ] 2.1 `journal_entries` + voice/text page on Home; parser with schema and dates; items fan out to `external_reps`, `people`, `events`.
+- [x] 2.1 `journal_entries` + voice/text page on Home; parser with schema and dates; items fan out to `external_reps`, `people`, `events`.
 - [ ] 2.2 `memories` table with pgvector; embeddings via the user's provider; importance job (Vercel Cron, nightly).
 - [ ] 2.3 Consolidation job; archive, never delete; review card on Home.
 - [ ] 2.4 Chat page: streaming, tools read-only by default, orchestrator → Memory agent; audit every call.
@@ -40,7 +40,7 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 3.1 `applications` + Kanban by stage with dnd-kit; import from v1.
 - [x] 3.2 Add by link with auto-fill; named search windows.
 - [x] 3.3 Funnel, assessments, intro calls.
-- [ ] 3.4 `people`, `events`, follow-ups; links to applications.
+- [x] 3.4 `people`, `events`, follow-ups; links to applications.
 - [ ] 3.5 Gmail (MCP) read-only suggestions, approved by click; Jobs and Network agents.
 
 ## Phase 4 — hardening
