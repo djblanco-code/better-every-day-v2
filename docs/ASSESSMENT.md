@@ -65,6 +65,6 @@ controls; colour is never the only signal (pills carry text). Follow-up: focus t
 ## Open follow-up tasks (added to TASKS.md as 4.5-4.8)
 
 - 4.5 `npm audit fix` and pin; re-run gitleaks and audit in CI weekly (scheduled workflow).
-- 4.6 zod-validate every server-action input; add rate limiting per user on model-calling actions.
+- 4.6 zod-validate every server-action input; rate limiting per user on model-calling actions (done 2026-10-22: 10 calls/min from `audit_log`, plus the monthly budget).
 - 4.7 Lighthouse in CI (`@lhci/cli`) with budgets; fix anything under 90 on mobile.
 - 4.8 Dialog focus trap + `aria-live`; axe-core smoke test on the main pages.

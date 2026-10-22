@@ -3,12 +3,15 @@
 import { describe, expect, it, vi } from "vitest";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { BudgetExceeded, NoKey, callModel, geminiSchema } from "./callModel";
+import { RateLimited } from "./ratelimit";
 
-function fakeSupabase(opts: { key: string | null; spent: number; budget?: number; provider?: string }) {
+function fakeSupabase(opts: { key: string | null; spent: number; budget?: number; provider?: string; recent?: number }) {
   const inserts: unknown[] = [];
   const sb = {
     from: (table: string) => ({
-      select: () => ({ maybeSingle: async () => ({ data: table === "ai_settings" ? { provider: opts.provider ?? "anthropic", model: null } : { budget_cents: opts.budget ?? 1000 } }) }),
+      select: (_cols?: string, o?: { count?: string; head?: boolean }) => o?.head
+        ? { eq: () => ({ gte: async () => ({ count: opts.recent ?? 0, error: null }) }) }
+        : { maybeSingle: async () => ({ data: table === "ai_settings" ? { provider: opts.provider ?? "anthropic", model: null } : { budget_cents: opts.budget ?? 1000 } }) },
       insert: async (row: unknown) => { inserts.push(row); return { error: null }; },
     }),
     rpc: async (fn: string) => ({ data: fn === "read_ai_key" ? opts.key : opts.spent }),
@@ -41,6 +44,13 @@ describe("callModel", () => {
     const { sb } = fakeSupabase({ key: "sk-ant-test", spent: 1000 });
     const transport = vi.fn();
     await expect(callModel(sb, "u1", { agent: "grader", system: "s", user: "u" }, transport)).rejects.toBeInstanceOf(BudgetExceeded);
+    expect(transport).not.toHaveBeenCalled();
+  });
+
+  it("refuses when more than 10 calls were made in the last minute", async () => {
+    const { sb } = fakeSupabase({ key: "sk-ant-test", spent: 0, recent: 10 });
+    const transport = vi.fn();
+    await expect(callModel(sb, "u1", { agent: "grader", system: "s", user: "u" }, transport)).rejects.toBeInstanceOf(RateLimited);
     expect(transport).not.toHaveBeenCalled();
   });
 

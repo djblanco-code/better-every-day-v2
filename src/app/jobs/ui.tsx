@@ -25,7 +25,7 @@ export function JobsNav({ active }: { active: "overview" | "board" | "action" | 
   const tabs: [typeof active, string, string][] = [["overview", "Overview", "/jobs"], ["board", "Board", "/jobs/board"], ["action", "Action needed", "/jobs/action"], ["all", "All applications", "/jobs/all"], ["todo", "Apply yourself", "/jobs/todo"]];
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div><Link href="/" className="text-sm text-neutral-600 hover:underline">← Home</Link><h1 className="text-3xl font-semibold tracking-tight">Job Tracker</h1></div>
+      <div><Link href="/" className="text-sm text-neutral-600 hover:underline">← Home</Link><h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Job Tracker</h1></div>
       <div className="flex flex-wrap gap-1 rounded-xl bg-neutral-200/60 p-1">{tabs.map(([k, l, h]) => <a key={k} href={h} className={`rounded-lg px-3 py-1.5 text-sm ${k === active ? "bg-white shadow-sm" : "text-neutral-600"}`}>{l}</a>)}</div>
     </div>
   );
