@@ -54,3 +54,12 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 4.10 Next 16 upgrade: closes the postcss advisory (`npm audit --omit=dev` = 0), flat ESLint config, `middleware.ts` → `proxy.ts`, React Compiler lint fixes.
 - [x] 4.9 Mobile shell: bottom tab bar on phones, top bar on wide screens, tables become cards under 768px, 16px inputs (no iOS zoom), safe-area padding, install nudge; per-minute AI rate limiter.
 - [x] 4.8 Dialog focus trap + `aria-live` status messages; axe-core smoke test on the main pages.
+
+## Phase 5 — scale and measure (from the 2026-10-22 system-design review; sources in docs/ASSESSMENT.md §7)
+- [ ] 5.1 RLS: wrap `auth.uid()` in a subselect in every policy (initPlan, ~95% faster policy checks).
+- [ ] 5.2 Index every policy column that is not already a key (verified: all covered; proof query in migration 0008).
+- [ ] 5.3 Local JWT verification (`getClaims()`) for page guards; `getUser()` only where revocation must be immediate.
+- [ ] 5.4 One RPC per page: `get_jobs_state` replaces the N queries behind the Jobs pages.
+- [ ] 5.5 Keep the free database awake: daily Vercel cron pings a health route that touches Postgres.
+- [ ] 5.6 Real-user Core Web Vitals (Speed Insights) with the 75th-percentile targets: LCP 2.5 s, INP 200 ms, CLS 0.1.
+- [ ] 5.7 RLS isolation test runs in CI against a throwaway local Supabase (Docker), no secrets needed.
