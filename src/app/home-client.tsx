@@ -46,7 +46,7 @@ export function HomeClient({ email, counts }: { email: string; counts: { apps: n
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-1 lg:content-start">
         {tile("/jobs", "Job Tracker", "Applications, follow-ups, assessments to do, calls to book.", [["applied", counts.apps], ["need you", counts.need, counts.need > 0], ["in interviews", counts.interviewing]], "Open Job Tracker")}
         {tile("/today", "Recall", "One hour a day for six months: LeetCode, Python, System Design, DSA and debugging, graded and scheduled.", [["day streak", counts.streak, counts.streak > 0], ["minutes today", counts.minutes, counts.minutes >= 60], ["readiness", `${counts.readiness}%`]], "Open Recall")}
-        {tile("/life", "Life", "Habits, how you slept and felt, and what you spent this month.", [["habits today", `${counts.habits_done}/${counts.habits_total}`], ["spent this month", `$${Math.round(counts.spent_cents / 100)}`]])}
+        {tile("/life", "Life", "Habits, how you slept and felt, and what you spent this month.", [["habits today", `${counts.habits_done}/${counts.habits_total}`], ["spent this month", `$${Math.round(counts.spent_cents / 100)}`], ["check-in", "today"]], "Open Life →")}
         {tile("/network", "Network", "People you met, mentors, events, and who can connect you to what.", [["people", counts.people], ["events", counts.events], ["follow-ups", counts.follow_ups, counts.follow_ups > 0]], "Open Network")}
       </div>
       </div>
