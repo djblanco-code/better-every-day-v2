@@ -13,7 +13,7 @@ export interface MailState { address: string; hint: string | null; last_checked_
 async function ctx() {
   const supabase = await supabaseServer();
   const data = await sessionUser(supabase);
-  if (!data.user) throw new Error("signed out");
+  if (!data.user) throw new Error("You're signed out. Sign in again.");
   return { supabase, uid: data.user.id };
 }
 const bump = () => { revalidatePath("/jobs/mail"); revalidatePath("/jobs"); revalidatePath("/settings"); };

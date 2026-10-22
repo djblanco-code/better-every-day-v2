@@ -19,7 +19,7 @@ export interface ProgramData {
 export async function getProgram(clientDate?: string): Promise<ProgramData> {
   const supabase = await supabaseServer();
   const data = await sessionUser(supabase);
-  if (!data.user) throw new Error("signed out");
+  if (!data.user) throw new Error("You're signed out. Sign in again.");
   const today = validDate(clientDate);
   const [{ banks, cur }, st] = await Promise.all([loadBanks(supabase), loadState(supabase, today)]);
   const m = metrics(st, banks, cur, today);

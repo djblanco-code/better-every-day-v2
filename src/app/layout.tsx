@@ -1,20 +1,14 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import { AppNav } from "./app-nav";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { supabaseServer } from "@/lib/supabase/server";
 import { sessionUser } from "@/lib/supabase/session";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"], display: "swap" });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+const fraunces = Fraunces({ variable: "--font-fraunces", subsets: ["latin"], display: "swap", axes: ["opsz", "SOFT"], weight: "variable" });
 
 export const viewport: Viewport = {
   themeColor: [
@@ -47,7 +41,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${inter.variable} ${fraunces.variable} antialiased`}
       >
         <AppNav signedIn={signedIn} />
         <div className="pb-20 md:pb-0">{children}</div>

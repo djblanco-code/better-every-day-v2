@@ -8,7 +8,7 @@ export const STAGE_TONE: Record<Stage, string> = {
   offer: "bg-green-50 text-green-700", ghosted: "bg-amber-50 text-amber-700", rejected: "bg-red-50 text-red-700", passed: "bg-red-50 text-red-700",
 };
 export const field = "h-9 rounded-lg border border-neutral-300 bg-white px-2 text-sm";
-export const btn = "inline-flex h-9 items-center rounded-lg bg-neutral-900 px-3 text-sm font-medium text-white hover:bg-neutral-800 disabled:opacity-50";
+export const btn = "inline-flex h-9 items-center rounded-lg bg-accent px-3 text-sm font-medium text-accent-ink hover:brightness-110 disabled:opacity-50";
 export const btnGhost = "inline-flex h-9 items-center rounded-lg border border-neutral-300 bg-white px-3 text-sm hover:bg-neutral-50 disabled:opacity-50";
 export const localDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 

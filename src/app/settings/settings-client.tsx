@@ -49,7 +49,7 @@ export function SettingsClient({ initial }: { initial: SettingsView }) {
       </section>
 
       <div className="flex flex-wrap items-center gap-2">
-        <button disabled={pending} onClick={save} className="h-10 rounded-lg bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-800 disabled:opacity-50">Save</button>
+        <button disabled={pending} onClick={save} className="h-10 rounded-lg bg-accent px-4 text-sm font-medium text-accent-ink hover:brightness-110 disabled:opacity-50">Save</button>
         <button disabled={pending || !s.key_hint} onClick={test} className="h-10 rounded-lg border border-neutral-300 px-4 text-sm hover:bg-neutral-50 disabled:opacity-50">Test the key</button>
         {s.key_hint ? <button disabled={pending} onClick={remove} className="h-10 rounded-lg px-3 text-sm text-red-700 hover:bg-red-50">Remove key</button> : null}
         {msg ? <span role="status" aria-live="polite" className="text-sm text-neutral-600">{msg}</span> : null}

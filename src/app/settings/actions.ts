@@ -14,7 +14,7 @@ export interface SettingsView {
 async function ctx() {
   const supabase = await supabaseServer();
   const data = await sessionUser(supabase);
-  if (!data.user) throw new Error("signed out");
+  if (!data.user) throw new Error("You're signed out. Sign in again.");
   return { supabase, user: data.user };
 }
 
