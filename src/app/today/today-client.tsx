@@ -2,12 +2,13 @@
 import Link from "next/link";
 import { Shell } from "../shell";
 import { useEffect, useState, useTransition } from "react";
-import { getToday, logMinutes, markDone, setTimeAvailable, swapSlot, tickHabit, type TodayData } from "./actions";
-import { CheckinForm } from "../life/checkin-form";
+import { clearDayPlan, getToday, logMinutes, makeDayPlan, markDone, swapSlot, tickHabit, type TodayData } from "./actions";
+import { DayPlanCard, MakingPlan } from "./day-plan-card";
+import { areaLabel } from "@/lib/goals/types";
 import { JournalCard } from "../journal/journal-card";
 import type { SlotView } from "@/lib/recall/plan";
 import type { Track } from "@/lib/recall/types";
-import { ENERGY, MOOD, TIME_OPTIONS, money } from "@/lib/life/types";
+import { ENERGY, MOOD, money } from "@/lib/life/types";
 
 const TRACK_NAME: Record<Track, string> = { leetcode: "LeetCode", python: "Python", system_design: "System Design", dsa: "Data Structures & Algorithms", debugging: "Debugging" };
 const localDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
@@ -20,7 +21,7 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
   const [data, setData] = useState<TodayData | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [extra, setExtra] = useState("");
-  const [showCheckin, setShowCheckin] = useState<boolean | null>(null);
+  const [making, setMaking] = useState(false);
   const [pending, start] = useTransition();
 
   useEffect(() => { getToday(localDate()).then(setData).catch((e) => setErr(String(e?.message ?? e))); }, []);
@@ -31,13 +32,11 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
 
   const { plan, summary, day } = data;
   const ck = day.checkin;
-  const checkedIn = !!(ck && (ck.energy || ck.mood || ck.sleep_hours != null));
   const hour = hourNow();
   const evening = hour >= 17, morning = hour < 12;
   const greeting = morning ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
   const dateLabel = new Date(data.today + "T12:00").toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
   const pct = Math.min(100, Math.round((100 * plan.minutes_done) / plan.target));
-  const checkinOpen = showCheckin ?? (morning && !checkedIn);
 
   const budget = ck?.time_available ?? null;
   const lowEnergy = !!ck?.energy && ck.energy <= 2 && budget == null;
@@ -53,6 +52,21 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
     day.habits.length ? `habits ${habitsDone}/${day.habits.length}` : null,
     day.spent_cents ? `${money(day.spent_cents)} spent this month` : null,
   ].filter(Boolean);
+  const focus = day.day_plan?.focus_goal_id ? day.goals.find((g) => g.id === day.day_plan!.focus_goal_id) ?? null : null;
+
+  if (making) return <Shell width="wide">{top}<MakingPlan /></Shell>;
+  if (!day.day_plan) {
+    return (
+      <Shell width="wide">
+        {top}
+        <header className="rise mx-auto w-full max-w-2xl">
+          <p className="text-sm text-neutral-500">{greeting} · {dateLabel} · week {plan.week}</p>
+          <h1 className="text-3xl sm:text-4xl">Let&apos;s make your daily plan.</h1>
+        </header>
+        <DayPlanCard goals={day.goals} pending={pending} defaultTime={budget ?? 60} onDone={(v) => { setMaking(true); const started = Date.now(); start(async () => { try { const next = await makeDayPlan(v, localDate()); const wait = Math.max(0, 1400 - (Date.now() - started)); await new Promise((r) => setTimeout(r, wait)); setData(next); } catch (e) { setErr(String((e as Error)?.message ?? e)); } finally { setMaking(false); } }); }} />
+      </Shell>
+    );
+  }
 
   return (
     <Shell width="wide">
@@ -68,24 +82,14 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
         </div>
       </header>
 
-      {elsewhere.length ? <p className="rise rise-2 text-sm text-neutral-600">{elsewhere.map((t, i) => <span key={i}>{i ? " · " : ""}{t}</span>)} · <Link href="/jobs/pipeline" className="underline">Jobs</Link> · <Link href="/network" className="underline">Network</Link> · <Link href="/life" className="underline">Life</Link></p> : null}
+      {elsewhere.length ? <p className="rise rise-2 text-sm text-neutral-600">{elsewhere.map((t, i) => <span key={i}>{i ? " · " : ""}{t}</span>)} · <Link href="/jobs/pipeline" className="underline">Jobs</Link> · <Link href="/network" className="underline">Network</Link> · <Link href="/life" className="underline">Life</Link> · <Link href="/goals" className="underline">Goals</Link></p> : null}
 
-      {/* Morning: check in. Evening: it folds to one line. */}
-      <section className={`rise rise-2 rounded-2xl border bg-white p-4 sm:p-5 ${checkinOpen ? "border-accent/40" : "border-neutral-200"}`}>
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="font-medium">{checkedIn ? "Checked in" : morning ? "How did you sleep?" : "How are you today?"}</h2>
-            <p className="text-sm text-neutral-500">{checkedIn ? [ck?.sleep_hours != null ? `${ck.sleep_hours} h sleep` : null, ck?.energy ? `energy ${ENERGY[ck.energy].toLowerCase()}` : null, ck?.mood ? `mood ${MOOD[ck.mood].toLowerCase()}` : null, ck?.exercise_minutes ? `${ck.exercise_minutes} min exercise` : null].filter(Boolean).join(" · ") : "Three taps. It sizes your hour."}</p>
-          </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs text-neutral-500">Time today</span>
-            {TIME_OPTIONS.map((m) => <button key={m} disabled={pending} aria-pressed={budget === m} onClick={() => run(() => setTimeAvailable(budget === m ? null : m, localDate()))} className={`h-8 rounded-lg border px-2.5 text-sm ${budget === m ? "border-neutral-900 bg-neutral-900 text-neutral-50" : "border-neutral-300 bg-white hover:bg-neutral-50"}`}>{m}</button>)}
-            <button className="h-8 rounded-lg px-2 text-sm text-neutral-600 hover:bg-neutral-50" onClick={() => setShowCheckin(!checkinOpen)}>{checkinOpen ? "Later" : checkedIn ? "Edit" : "Check in"}</button>
-          </div>
-        </div>
-        {checkinOpen ? <div className="mt-4 border-t border-neutral-100 pt-4"><CheckinForm key={JSON.stringify(ck)} today={data.today} current={ck} compact onSaved={() => { setShowCheckin(false); run(() => getToday(localDate())); }} /></div> : null}
-        {lowEnergy ? <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">Low-energy day. The hour is sized to 40 minutes with the review first. Pick a time above to change that.</p> : null}
+      {/* The daily plan line: time, the goal that gets today, how you are. Change asks again. */}
+      <section className="rise rise-2 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm">
+        <p><span className="font-medium">Today:</span> {day.day_plan!.time_available} min{focus ? <> · for <span className="font-medium">{focus.title}</span> <span className="text-neutral-500">({areaLabel(focus.area)})</span></> : day.goals.length ? "" : <> · <Link href="/goals" className="underline">set your goals</Link></>}{ck?.energy ? ` · energy ${ENERGY[ck.energy].toLowerCase()}` : ""}{ck?.mood ? ` · mood ${MOOD[ck.mood].toLowerCase()}` : ""}{ck?.sleep_hours != null ? ` · ${ck.sleep_hours} h sleep` : ""}</p>
+        <button className="text-neutral-600 hover:underline" onClick={() => run(() => clearDayPlan(localDate()))}>Change</button>
       </section>
+
 
       {/* The plan. Done → it folds to one line. */}
       <section className="rise rise-3 space-y-3">

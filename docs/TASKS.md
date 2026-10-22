@@ -85,3 +85,9 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 8.3 Insights keeps three numbers. Error copy sounds like a person.
 - [x] 8.5 Home always has the same shape (the day-zero card was removed at the owner's request; the journal must always be on the page).
 - [ ] 8.4 Keyboard: Return submits every form; a shortcut for Start on the first slot.
+
+## Phase 9 — goals and the daily plan (PRD §4.7)
+- [x] 9.1 Schema: goals, goal_profile, day_plans (migration 0012, RLS, applied live).
+- [x] 9.2 Goals questionnaire (`/goals`): seven questions, WOOP shape, editable; the list it produces.
+- [x] 9.3 Daily plan ritual on Home: the questionnaire owns the page (time, goal for today, energy, then the check-in: sleep, mood, exercise), "Making today's plan…" for a beat, then the plan; one line with Change afterwards; the separate check-in card is gone from Home (it lives in Life).
+- [ ] 9.4 Lead the page with the focus goal's items (job → Pipeline due items; network → follow-ups; health → habits) and show the if-then plan on low-energy days.
