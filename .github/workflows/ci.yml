@@ -57,3 +57,29 @@ jobs:
       - uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  rls:
+    name: RLS isolation (throwaway local Supabase)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - run: npm ci
+      # Boots Postgres + Auth + PostgREST in Docker and applies supabase/migrations. Studio and the rest are skipped.
+      - run: supabase start -x studio,imgproxy,inbucket,mailpit,edge-runtime,logflare,vector,realtime,storage-api,pgbouncer,supavisor
+      - name: Export the throwaway keys (local only; they never leave the runner)
+        run: >
+          supabase status -o env
+          --override-name api.url=NEXT_PUBLIC_SUPABASE_URL
+          --override-name auth.anon_key=NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
+          --override-name auth.service_role_key=SUPABASE_SECRET_KEY
+          | sed 's/"//g' >> "$GITHUB_ENV"
+      - run: npx vitest run src/lib/db --reporter=verbose
+      - if: always()
+        run: supabase stop --no-backup
