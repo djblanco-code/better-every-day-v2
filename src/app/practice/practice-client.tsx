@@ -51,7 +51,7 @@ export function PracticeClient({ initialTrack }: { initialTrack: string }) {
             <span className="text-sm text-neutral-500">{L.length} of {D.items.length}</span>
           </div>
           <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">
-            <table className="w-full text-sm">
+            <table className="tbl-cards w-full text-sm">
               <thead><tr className="text-left text-xs text-neutral-500"><th className="px-4 py-2">Problem</th><th className="px-4 py-2">Difficulty</th><th className="px-4 py-2">Topic</th>{track === "leetcode" ? <th className="px-4 py-2">Companies</th> : null}<th className="px-4 py-2">Best</th><th className="px-4 py-2">Next due</th></tr></thead>
               <tbody>{L.slice(0, 300).map((i) => { const p = D.progress[i.id]; const due = p?.next_due && p.next_due <= today; const cos = (i as { companies?: string[]; company_count?: number }); return (
                 <tr key={i.id} className="cursor-pointer border-t border-neutral-100 hover:bg-neutral-50" onClick={() => { window.location.href = href(i.id); }}>

@@ -37,14 +37,14 @@ export function TodayClient({ email }: { email: string }) {
       {plan.complete ? <p className="rounded-xl bg-green-50 p-4 text-sm text-green-900">Day done. Every slot is finished — {Math.round(plan.minutes_done)} minutes.</p> : null}
 
       <section className="grid gap-3 sm:grid-cols-[auto_1fr]">
-        <div className="flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-5">
+        <div className="flex items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-4 sm:p-5">
           <Ring pct={pct} label={`${Math.round(plan.minutes_done)}`} sub={`of ${plan.target} min`} />
           <div>
             <p className="font-medium">{pct >= 100 ? "Hour done" : pct ? `${plan.target - Math.round(plan.minutes_done)} min to go` : "Start the first slot"}</p>
             <p className="text-sm text-neutral-500">Plan: {plan.minutes_planned} min across {plan.slots.length} slots</p>
             <div className="mt-3 flex items-center gap-2">
               <input value={extra} onChange={(e) => setExtra(e.target.value)} inputMode="numeric" placeholder="min" className="h-8 w-20 rounded-lg border border-neutral-300 px-2 text-sm" aria-label="Extra minutes" />
-              <button disabled={pending || !+extra} onClick={() => { run(() => logMinutes(+extra, localDate())); setExtra(""); }} className="h-8 rounded-lg border border-neutral-300 px-3 text-sm hover:bg-neutral-50 disabled:opacity-50">Log extra time</button>
+              <button disabled={pending || !+extra} onClick={() => { run(() => logMinutes(+extra, localDate())); setExtra(""); }} className="h-8 rounded-lg border border-neutral-300 px-3 text-sm hover:bg-neutral-50 disabled:opacity-50"><span className="sm:hidden">Log</span><span className="hidden sm:inline">Log extra time</span></button>
             </div>
           </div>
         </div>
@@ -98,7 +98,7 @@ function SlotCard({ i, s, pending, onSwap, onDone, onUndo }: { i: number; s: Slo
   return (
     <div className="flex flex-wrap items-center gap-4 rounded-2xl border border-neutral-200 bg-white p-5">
       <div className={`grid h-10 w-10 flex-none place-items-center rounded-full text-sm font-semibold ${s.done ? "bg-green-100 text-green-700" : "bg-blue-50 text-blue-700"}`}>{s.done ? "✓" : i + 1}</div>
-      <div className="min-w-0 flex-1">
+      <div className="min-w-0 flex-1 basis-full sm:basis-0">
         <p className="text-xs text-neutral-500">{meta}</p>
         <p className={`font-medium ${s.done ? "text-neutral-400 line-through" : ""}`}>{s.title ?? "(nothing left in this track)"}</p>
         <p className="text-xs text-neutral-400">{why}</p>

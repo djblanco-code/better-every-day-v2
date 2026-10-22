@@ -1,6 +1,7 @@
 import "server-only";
 import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { checkRateLimit } from "./ratelimit";
 
 // The one way the app talks to a model (PROCESS.md hard rule). Stability rules from v1, kept:
 // temperature 0, a JSON schema enforced by the provider (Claude tool use / Gemini responseSchema), retries with
@@ -37,6 +38,7 @@ async function settings(supabase: SupabaseClient) {
 export async function callModel<T = string>(supabase: SupabaseClient, userId: string, o: CallOpts, transport: Transport = fetchTransport): Promise<CallResult<T>> {
   const cfg = await settings(supabase);
   if (!cfg.key) throw new NoKey("No AI key saved. Open Settings and paste your Anthropic or Gemini key.");
+  await checkRateLimit(supabase, userId);
   if (cfg.spent >= cfg.budget) throw new BudgetExceeded(`Monthly AI budget reached ($${(cfg.budget / 100).toFixed(2)}). Raise it in Settings or wait for next month.`);
   const inputHash = createHash("sha256").update(o.system + "\n" + o.user).digest("hex").slice(0, 16);
   let result: CallResult<T> | null = null, err: string | null = null;

@@ -1,5 +1,6 @@
 "use client";
 import Link from "next/link";
+import { InstallHint } from "./install-hint";
 import { useEffect, useRef, useState } from "react";
 import { addEntry, deleteEntry, getJournal, type Entry, type Item } from "./journal/actions";
 import { btn, btnGhost, Card, Shell } from "./jobs/ui";
@@ -34,6 +35,7 @@ export function HomeClient({ email, counts }: { email: string; counts: { apps: n
   );
   return (
     <Shell>
+      <InstallHint />
       <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-sm text-neutral-500">{today}</p><h1 className="text-3xl font-semibold tracking-tight">Better Every Day</h1><p className="text-sm text-neutral-500">Two things, every day: move the job search forward, and get sharper for the interviews.</p></div><form action="/auth/sign-out" method="post"><button className="text-sm text-neutral-500 hover:underline">{email} · Sign out</button></form></div>
       <Card title="What did you do today?" sub="A job fair, people you met, a mock interview, a real one. Say it or type it; it gets sorted into Network and Recall.">
         <textarea className="min-h-[88px] w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" value={text} onChange={(e) => setText(e.target.value)} placeholder="Went to the NYC tech meetup, met three people. Did a mock interview, aced it. Google phone screen went okay." />

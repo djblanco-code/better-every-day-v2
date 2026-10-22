@@ -1,6 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AppNav } from "./app-nav";
+import { supabaseServer } from "@/lib/supabase/server";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,17 +33,20 @@ export const metadata: Metadata = {
   description: "One hour a day: interview practice, applications, and the people who can help.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  let signedIn = false;
+  try { const sb = await supabaseServer(); signedIn = !!(await sb.auth.getUser()).data.user; } catch { signedIn = false; }
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <AppNav signedIn={signedIn} />
+        <div className="pb-20 md:pb-0">{children}</div>
       </body>
     </html>
   );
