@@ -38,6 +38,8 @@ export interface DayExtras {
   due: DueItem[];                                  // assessments, intro calls, network follow-ups
   spent_cents: number; limit_cents: number;        // money, this month
   goals: Goal[];                                   // active goals, most important first
+  leads: number;                                   // roles waiting in Leads (apply yourself)
+  stale: number;                                   // applications gone quiet (Pipeline rule)
   plan_day: string;                                // the planning day (06:00 America/New_York rollover)
   day_plan: DayPlan | null;                        // today's answers, or null until the ritual is done
 }
@@ -46,7 +48,7 @@ export interface TodayData { plan: PlanView; summary: Summary; today: string; da
 /** Everything on Today that is not the Recall plan. One parallel fetch; each table is RLS-scoped. */
 async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras> {
   const today = c.today, soon = (() => { const d = new Date(today + "T12:00"); d.setDate(d.getDate() + 3); return d.toISOString().slice(0, 10); })();
-  const [ck, hb, hl, na, as, ac, pp, tx, bg, gl, dp] = await Promise.all([
+  const [ck, hb, hl, na, as, ac, pp, tx, bg, gl, dp, ld, stl] = await Promise.all([
     c.supabase.from("checkins").select("date,sleep_hours,energy,mood,exercise_minutes,weight,time_available,note").eq("date", today).maybeSingle(),
     c.supabase.from("habits").select("id,name,icon,cadence,target_per_week,active,sort").eq("active", true).order("sort"),
     c.supabase.from("habit_logs").select("habit_id,done").eq("date", today),
@@ -58,6 +60,8 @@ async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras>
     c.supabase.from("budgets").select("limit_cents"),
     c.supabase.from("goals").select("id,area,title,why,priority,active").eq("active", true).order("priority"),
     c.supabase.from("day_plans").select("day,time_available,energy,focus_goal_id,note").eq("day", planningDay()).maybeSingle(),
+    c.supabase.from("applications").select("id", { count: "exact", head: true }).eq("kind", "todo").eq("todo_status", "open"),
+    c.supabase.from("applications").select("id,stage,applied_on,next_action_on,history").eq("kind", "applied").eq("stage", "applied").is("next_action_on", null).lte("applied_on", (() => { const d = new Date(today + "T12:00"); d.setDate(d.getDate() - 14); return d.toISOString().slice(0, 10); })()),
   ]);
   const doneIds = new Set(((hl.data ?? []) as { habit_id: string; done: boolean }[]).filter((l) => l.done).map((l) => l.habit_id));
   const habits = ((hb.data ?? []) as Habit[]).filter((h) => dueToday(h, today)).map((habit) => ({ habit, done: doneIds.has(habit.id) }));
@@ -84,6 +88,8 @@ async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras>
     goals: (gl.data ?? []) as Goal[],
     plan_day: planningDay(),
     day_plan: (dp.data as DayPlan | null) ?? null,
+    leads: ld.count ?? 0,
+    stale: ((stl.data ?? []) as { history: { stage: string }[] | null }[]).filter((a) => !(a.history ?? []).some((h) => h.stage !== "applied")).length,
   };
 }
 

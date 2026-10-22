@@ -107,14 +107,17 @@ Goal: the day starts with a question, not a dashboard, and the plan bends to the
   (wish → what done looks like per area → obstacle → if-then plan) plus two constraints (hours a week, best time
   and days off). Up to three areas, one goal each. Research: implementation intentions raise goal attainment
   (d ≈ .61, Gollwitzer & Sheeran 2006); onboarding questionnaires should stay under ten mixed questions.
-- G2. **Daily plan ritual**: Home asks "Let's make your daily plan" and shows nothing else until it is done: how
-  much time today, which goal gets today, how much energy, then the check-in (sleep, mood, exercise). Then a short
-  "Making today's plan…" beat and the plan. Asked once per planning day and then shown as one line with "Change".
+- G2. **Daily plan ritual**: on the first open of the day Home shows one question and nothing else: "How much time
+  do you have today?" Tapping a chip makes the plan ("Making today's plan…", then the page). The goals do not change
+  day to day; the time does, and the time decides what is possible. Asked once per planning day; afterwards the
+  Today line says it in one sentence, with "Change".
 - G3. **Planning day** rolls over at 06:00 America/New_York, so a 1 a.m. session still belongs to the day before.
-- G4. **The plan bends**: time trims the hour (slots past it wait as "if time allows"); the focus goal is what
-  the page leads with; energy 1-2 shortens the hour to 40 minutes with the review first. The engine's plan is
-  never rewritten (golden tests stay valid); only what is asked of you today changes.
-- G5. With no goals yet, the ritual still asks time and energy and points at the questionnaire.
+- G4. **What is possible**: the hour's slots take the time first, in order, while they fit; the minutes left go to
+  the goals' small items in goal order (Jobs due items, one lead, quiet applications; follow-ups; habits; log
+  spending; 20 min of learning). Home shows the next slot that fits and "Also possible today". The engine's plan is
+  never rewritten (golden tests stay valid); only what is asked of you today changes. Users glance at Home several
+  times a day, so it answers "what next" in one line.
+- G5. With no goals yet, "Also possible today" points at the questionnaire. Sleep, mood and energy live in Life.
 
 ### 4.5 Chat (the Claude wrapper, phase 2+)
 - C1. A chat page with the user's own key, streaming, with tools scoped per request (read-only by default).
