@@ -28,7 +28,7 @@ export function SettingsClient({ initial }: { initial: SettingsView }) {
     <Shell gap="gap-5">
       <div className="flex items-end justify-between gap-3">
         <div><Link href="/" className="text-sm text-neutral-600 hover:underline">← Home</Link><h1 className="text-3xl font-semibold tracking-tight">Settings</h1></div>
-        <span className="text-sm text-neutral-500">{s.email}</span>
+        <form action="/auth/sign-out" method="post" className="flex items-center gap-3 text-sm text-neutral-500"><span>{s.email}</span><button className="rounded-lg border border-neutral-300 bg-white px-3 py-1.5 text-neutral-700 hover:bg-neutral-50">Sign out</button></form>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(300px,380px)]">

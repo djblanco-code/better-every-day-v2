@@ -17,7 +17,7 @@ const hourNow = () => new Date().getHours();
 // Home = the hour. Three things: check in, the plan, the journal. Everything else is one line and one tap away.
 // docs/SOUL.md: mornings open the check-in; evenings lead with the journal; a finished hour folds the plan and
 // says one quiet line. The journal is always on the page: it is where you say what you did today.
-export function TodayClient({ email, counts, top }: { email: string; counts: { apps: number; interviewing: number; people: number; events: number }; top?: React.ReactNode }) {
+export function TodayClient({ counts, top }: { counts: { apps: number; interviewing: number; people: number; events: number }; top?: React.ReactNode }) {
   const [data, setData] = useState<TodayData | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [extra, setExtra] = useState("");
@@ -76,10 +76,7 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
           <p className="text-sm text-neutral-500">{greeting} · {dateLabel} · week {plan.week}</p>
           <h1 className="text-3xl sm:text-4xl">{plan.complete ? "Hour done." : pct ? `${plan.target - Math.round(plan.minutes_done)} minutes to go.` : summary.sessions_total === 0 ? "Your first hour." : "Your hour."}</h1>
         </div>
-        <div className="flex items-center gap-4">
-          <Ring pct={pct} label={`${Math.round(plan.minutes_done)}`} sub={`of ${plan.target}`} />
-          <form action="/auth/sign-out" method="post"><button className="text-xs text-neutral-500 hover:underline">{email} · Sign out</button></form>
-        </div>
+        <Ring pct={pct} label={`${Math.round(plan.minutes_done)}`} sub={`of ${plan.target}`} />
       </header>
 
       {elsewhere.length ? <p className="rise rise-2 text-sm text-neutral-600">{elsewhere.map((t, i) => <span key={i}>{i ? " · " : ""}{t}</span>)} · <Link href="/jobs/pipeline" className="underline">Jobs</Link> · <Link href="/network" className="underline">Network</Link> · <Link href="/life" className="underline">Life</Link> · <Link href="/goals" className="underline">Goals</Link></p> : null}

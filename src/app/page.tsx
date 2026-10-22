@@ -28,5 +28,5 @@ export default async function Home() {
     supabase.from("events").select("id"),
   ]);
   const A = (apps.data ?? []) as { stage: string }[];
-  return <TodayClient email={user.email ?? ""} counts={{ apps: A.length, interviewing: A.filter((a) => (ACTIVE as string[]).includes(a.stage)).length, people: people.data?.length ?? 0, events: events.data?.length ?? 0 }} top={<InstallHint />} />;
+  return <TodayClient counts={{ apps: A.length, interviewing: A.filter((a) => (ACTIVE as string[]).includes(a.stage)).length, people: people.data?.length ?? 0, events: events.data?.length ?? 0 }} top={<InstallHint />} />;
 }

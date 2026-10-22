@@ -18,7 +18,7 @@ export function AppNav({ signedIn }: { signedIn: boolean }) {
   if (!signedIn || HIDE.some((h) => path.startsWith(h))) return null;
   return (
     <>
-      <nav aria-label="Primary" className="sticky top-0 z-40 hidden h-12 items-center gap-1 border-b border-neutral-200 bg-white/90 px-4 backdrop-blur md:flex">
+      <nav aria-label="Primary" className="sticky top-0 z-40 hidden h-12 items-center justify-center gap-1 border-b border-neutral-200 bg-white/90 px-4 backdrop-blur md:flex">
         <Link href="/" className="mr-3 text-sm font-semibold">Better Every Day</Link>
         {TABS.map((t) => <Link key={t.href} href={t.href} aria-current={t.match(path) ? "page" : undefined} className={`rounded-lg px-3 py-1.5 text-sm ${t.match(path) ? "bg-neutral-900 text-white" : "text-neutral-600 hover:bg-neutral-100"}`}>{t.label}</Link>)}
       </nav>
