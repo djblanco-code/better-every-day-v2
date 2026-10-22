@@ -31,3 +31,10 @@
 1. They sign in with GitHub (or Google once enabled) at the production URL.
 2. Give them the invite code (rotate it with the insert in `supabase/migrations/0002_invite_gate.sql` whenever you like).
 3. They paste their own AI key in Settings. Their data is theirs: RLS on every table.
+
+## Keep-alive and health (5.5)
+`GET /api/health` runs `select public.ping()` and returns `{ ok, db_time, ms }`. `vercel.json` schedules it daily at
+09:00 UTC (Hobby allows one run a day). A free Supabase project pauses after 7 idle days; this call is the activity
+that prevents it. Set `CRON_SECRET` in Vercel (Production) to any random string: Vercel then sends it as a bearer
+token and the route refuses everyone else. Without it the route is public but harmless (clock only). If the project
+does pause anyway, restore it from the Supabase dashboard; the data is kept.
