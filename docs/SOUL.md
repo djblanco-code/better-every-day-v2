@@ -15,8 +15,9 @@ not ours: does it feel inevitable, and did someone care about the parts you neve
 
 1. **One sentence, then no.** Home = check-in, plan, journal. Jobs, Network, Life are one tap away and say in
    one line whether they need you. The readiness-by-track panel lives in Program; money lives in Life.
-2. **Design the first minute.** With no sessions yet, Home is a single card: the first slot, already chosen, one
-   Start button, one line of why. The whole plan unfolds after the first session.
+2. **Design the first minute.** With no sessions yet the title reads "Your first hour." and nothing else changes:
+   the owner asked for one home page, always the same shape (a day-zero card that hid the journal was tried and
+   removed on 2026-10-22).
 3. **Two rituals.** Morning (before noon): the check-in is open and greets you. Evening (after five): the journal
    leads, asks "How did today go?", and the check-in folds away. Cards rise in, 400 ms, once, never on reduced motion.
 4. **Celebrate quietly.** When the hour is done the plan folds and one line says "Day 12. Readiness 34%." No
@@ -43,7 +44,7 @@ not ours: does it feel inevitable, and did someone care about the parts you neve
 - Fonts (`src/app/layout.tsx`): Fraunces for `h1` and the `.display` class, Inter for the body (the body was Arial).
 - Tokens (`src/app/globals.css`): warm paper neutrals and a designed dark set, both mapped onto Tailwind's
   neutral/white tokens so every page follows without edits; `.rise` entrance; focus-visible rings.
-- Home (`src/app/today/today-client.tsx`): three things; day-zero card; morning/evening order; day-done line;
+- Home (`src/app/today/today-client.tsx`): three things, always the same shape; morning/evening order; day-done line;
   one-line "elsewhere" strip for Jobs, Network, Life.
 - Insights: three tiles.
 - Copy: "signed out" → "You're signed out. Sign in again."; "Loading…" stays (it is honest).

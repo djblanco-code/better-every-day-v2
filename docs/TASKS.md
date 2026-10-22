@@ -81,6 +81,7 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 
 ## Phase 8 — soul (docs/SOUL.md)
 - [x] 8.1 Type and tokens: Fraunces for titles and the hero number, Inter for the body (it was Arial), warm paper neutrals, one accent for the next thing to do, a designed dark set, focus rings, cards that rise once.
-- [x] 8.2 Home is three things: check-in, the hour, the journal; one line for everything else. Day zero is one card with one button. Mornings open the check-in; evenings lead with the journal; a finished hour folds into one line.
+- [x] 8.2 Home is three things: check-in, the hour, the journal; one line for everything else. Mornings open the check-in; evenings lead with the journal; a finished hour folds into one line.
 - [x] 8.3 Insights keeps three numbers. Error copy sounds like a person.
+- [x] 8.5 Home always has the same shape (the day-zero card was removed at the owner's request; the journal must always be on the page).
 - [ ] 8.4 Keyboard: Return submits every form; a shortcut for Start on the first slot.

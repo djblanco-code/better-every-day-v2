@@ -14,14 +14,13 @@ const localDate = () => { const d = new Date(); return `${d.getFullYear()}-${Str
 const hourNow = () => new Date().getHours();
 
 // Home = the hour. Three things: check in, the plan, the journal. Everything else is one line and one tap away.
-// docs/SOUL.md: day zero is a single card; mornings open the check-in; evenings lead with the journal; a finished
-// hour folds the plan and says one quiet line.
+// docs/SOUL.md: mornings open the check-in; evenings lead with the journal; a finished hour folds the plan and
+// says one quiet line. The journal is always on the page: it is where you say what you did today.
 export function TodayClient({ email, counts, top }: { email: string; counts: { apps: number; interviewing: number; people: number; events: number }; top?: React.ReactNode }) {
   const [data, setData] = useState<TodayData | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [extra, setExtra] = useState("");
   const [showCheckin, setShowCheckin] = useState<boolean | null>(null);
-  const [showAll, setShowAll] = useState(false);
   const [pending, start] = useTransition();
 
   useEffect(() => { getToday(localDate()).then(setData).catch((e) => setErr(String(e?.message ?? e))); }, []);
@@ -38,7 +37,6 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
   const greeting = morning ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
   const dateLabel = new Date(data.today + "T12:00").toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
   const pct = Math.min(100, Math.round((100 * plan.minutes_done) / plan.target));
-  const dayZero = summary.sessions_total === 0 && plan.minutes_done === 0 && !checkedIn;
   const checkinOpen = showCheckin ?? (morning && !checkedIn);
 
   const budget = ck?.time_available ?? null;
@@ -56,33 +54,13 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
     day.spent_cents ? `${money(day.spent_cents)} spent this month` : null,
   ].filter(Boolean);
 
-  // Day zero: one card, one button.
-  if (dayZero && !showAll) {
-    const first = plan.slots[0];
-    return (
-      <Shell width="read">
-        {top}
-        <section className="rise mt-10 rounded-3xl border border-neutral-200 bg-white p-8 sm:p-10">
-          <p className="text-sm text-neutral-500">{dateLabel}</p>
-          <h1 className="mt-2 text-4xl leading-tight sm:text-5xl">Your first hour starts here.</h1>
-          <p className="mt-4 max-w-prose text-neutral-600">One hour a day, every day, until you&apos;re hired. The plan is already made. Today it begins with this:</p>
-          {first ? <div className="mt-6"><SlotCard i={0} s={first} later={false} pending={pending} big onSwap={() => run(() => swapSlot(0, localDate()))} onDone={(m) => run(() => markDone((first as { id: string }).id, m, false, localDate()))} onUndo={() => run(() => markDone((first as { id: string }).id, 0, true, localDate()))} /></div> : null}
-          <div className="mt-6 flex flex-wrap items-center gap-4 text-sm">
-            <button className="text-neutral-600 hover:underline" onClick={() => setShowAll(true)}>See the whole plan for today</button>
-            <Link href="/program" className="text-neutral-600 hover:underline">How the six months work</Link>
-          </div>
-        </section>
-      </Shell>
-    );
-  }
-
   return (
     <Shell width="wide">
       {top}
       <header className="rise flex flex-wrap items-end justify-between gap-3">
         <div>
           <p className="text-sm text-neutral-500">{greeting} · {dateLabel} · week {plan.week}</p>
-          <h1 className="text-3xl sm:text-4xl">{plan.complete ? "Hour done." : pct ? `${plan.target - Math.round(plan.minutes_done)} minutes to go.` : "Your hour."}</h1>
+          <h1 className="text-3xl sm:text-4xl">{plan.complete ? "Hour done." : pct ? `${plan.target - Math.round(plan.minutes_done)} minutes to go.` : summary.sessions_total === 0 ? "Your first hour." : "Your hour."}</h1>
         </div>
         <div className="flex items-center gap-4">
           <Ring pct={pct} label={`${Math.round(plan.minutes_done)}`} sub={`of ${plan.target}`} />
