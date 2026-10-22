@@ -90,10 +90,11 @@ and Today becomes "your day" instead of only the Recall plan.
   "time for Recall today" (20/40/60/90 min). Takes under 20 seconds. From Today or from Life.
 - L3. **Money**: expenses and income by category with a standing monthly limit per category; the month view
   leads with "spent vs limit" per category, then a list. Manual entry and journal entry only; no bank sync.
-- L4. **Today = your day**: check-in on top; "needs you today" (assessments and intro calls due or overdue,
+- L4. **Home = your day** (there is no separate Today page): check-in on top; "needs you today" (assessments and intro calls due or overdue,
   network follow-ups); the Recall plan trimmed to the time available (slots that do not fit are shown as
   "if time allows", never dropped from the plan); today's habits; readiness and money at a glance.
-  Low energy (1-2) with no time set suggests 40 minutes with the review slot first.
+  Low energy (1-2) with no time set suggests 40 minutes with the review slot first. The journal box closes the
+  page (end of day), so one screen covers morning, work and evening.
 - L5. **Journal** also parses expenses ("spent $14 on lunch"), health ("slept 6 hours, ran 30 min") and
   habits that already exist by name. It never creates a habit or a category from a note.
 Sources: Sunsama's morning ritual (short fixed sequence, realistic commitment, shutdown review); TickTick for

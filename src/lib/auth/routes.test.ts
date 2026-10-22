@@ -14,8 +14,8 @@ describe("auth routes", () => {
     expect(redirectFor("/", false)).toBeNull();
   });
   it("keeps a signed-in, invited user off the sign-in and invite pages", () => {
-    expect(redirectFor("/sign-in", true)).toBe("/today");
-    expect(redirectFor("/invite", { signedIn: true, invited: true })).toBe("/today");
+    expect(redirectFor("/sign-in", true)).toBe("/");
+    expect(redirectFor("/invite", { signedIn: true, invited: true })).toBe("/");
     expect(redirectFor("/today", true)).toBeNull();
   });
   it("holds a signed-in but uninvited user at the invite page", () => {
@@ -27,9 +27,9 @@ describe("auth routes", () => {
     expect(redirectFor("/", v)).toBeNull();
   });
   it("never redirects to another origin after sign-in", () => {
-    expect(safeNext("https://evil.example")).toBe("/today");
-    expect(safeNext("//evil.example")).toBe("/today");
+    expect(safeNext("https://evil.example")).toBe("/");
+    expect(safeNext("//evil.example")).toBe("/");
     expect(safeNext("/program")).toBe("/program");
-    expect(safeNext(null)).toBe("/today");
+    expect(safeNext(null)).toBe("/");
   });
 });

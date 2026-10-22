@@ -70,4 +70,5 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 6.1 Schema: habits, habit_logs, checkins, transactions, budgets (migration 0010, RLS, applied live).
 - [x] 6.2 Life page (`/life`): habits grid + today's taps, check-in, money month view with limits; Life in the nav and on Home.
 - [x] 6.3 Today = your day: check-in, needs-you-today, plan trimmed to time available, habits row, glance panel.
+- [x] 6.5 One home: the day view IS the home page (`/`); the journal card lives at the end of it; `/today` redirects; nav is Home, Jobs, Network, Life, Settings.
 - [x] 6.4 Journal parses expenses, health and existing habits into Life (parser v3).

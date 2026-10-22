@@ -1,10 +1,8 @@
 import { publicEnv } from "@/lib/env";
 import { supabaseServer } from "@/lib/supabase/server";
-import { loadBanks } from "@/lib/recall/banks";
-import { loadState } from "@/lib/recall/store";
-import { summary } from "@/lib/recall/plan";
 import { ACTIVE } from "@/lib/jobs/types";
-import { HomeClient } from "./home-client";
+import { TodayClient } from "./today/today-client";
+import { InstallHint } from "./install-hint";
 import { sessionUser } from "@/lib/supabase/session";
 
 // Signed out: a short landing with sign-in. Signed in: the launcher (journal + the three apps with live counts).
@@ -24,26 +22,11 @@ export default async function Home() {
       </main>
     );
   }
-  const today = new Date().toISOString().slice(0, 10);
-  const [{ banks, cur }, st, apps, assess, actions, people, events, habits, hlogs, spend] = await Promise.all([
-    loadBanks(supabase), loadState(supabase, today),
+  const [apps, people, events] = await Promise.all([
     supabase.from("applications").select("stage,kind").eq("kind", "applied"),
-    supabase.from("assessments").select("status").in("status", ["todo", "expired"]),
-    supabase.from("actions").select("done").eq("done", false),
-    supabase.from("people").select("follow_up,follow_up_done"),
+    supabase.from("people").select("id"),
     supabase.from("events").select("id"),
-    supabase.from("habits").select("id,cadence").eq("active", true),
-    supabase.from("habit_logs").select("habit_id").eq("date", today).eq("done", true),
-    supabase.from("transactions").select("amount_cents").eq("kind", "expense").gte("date", today.slice(0, 7) + "-01"),
   ]);
-  const s = summary(st, banks, cur, today);
   const A = (apps.data ?? []) as { stage: string }[];
-  const P = (people.data ?? []) as { follow_up: string; follow_up_done: boolean }[];
-  return (
-    <HomeClient email={user.email ?? ""} counts={{
-      apps: A.length, need: (assess.data?.length ?? 0) + (actions.data?.length ?? 0), interviewing: A.filter((a) => (ACTIVE as string[]).includes(a.stage)).length,
-      streak: s.streak, minutes: Math.round(s.today_minutes), readiness: s.readiness_overall, people: P.length, events: events.data?.length ?? 0, follow_ups: P.filter((p) => p.follow_up && !p.follow_up_done).length,
-      habits_done: hlogs.data?.length ?? 0, habits_total: habits.data?.length ?? 0, spent_cents: (spend.data ?? []).reduce((a: number, t: { amount_cents: number }) => a + t.amount_cents, 0),
-    }} />
-  );
+  return <TodayClient email={user.email ?? ""} counts={{ apps: A.length, interviewing: A.filter((a) => (ACTIVE as string[]).includes(a.stage)).length, people: people.data?.length ?? 0, events: events.data?.length ?? 0 }} top={<InstallHint />} />;
 }

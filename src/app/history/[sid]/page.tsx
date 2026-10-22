@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Shell } from "@/app/shell";
 import { notFound, redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
@@ -28,7 +29,7 @@ export default async function Result({ params }: { params: Promise<{ sid: string
   ];
   return (
     <Shell width="read">
-      <div><a href="/today" className="text-sm text-neutral-600 hover:underline">← Today</a>
+      <div><Link href="/" className="text-sm text-neutral-600 hover:underline">← Today</Link>
         <h1 className="text-2xl font-semibold tracking-tight">{s.title}</h1>
         <p className="text-sm text-neutral-500">{TRACK_NAME[track]} · {s.date} {s.time} · {s.minutes_used} of {s.timer_minutes} min · grader v{s.grader} · {s.model}</p></div>
       <div className="grid gap-3 sm:grid-cols-3">
@@ -54,7 +55,7 @@ export default async function Result({ params }: { params: Promise<{ sid: string
       <details className="rounded-2xl border border-neutral-200 bg-white"><summary className="cursor-pointer px-5 py-3 text-sm font-medium text-neutral-600">What you wrote</summary><pre className="whitespace-pre-wrap border-t border-neutral-200 px-5 py-4 font-mono text-[13px] leading-6">{s.answer}</pre></details>
       <div className="flex flex-wrap gap-2">
         <a href={`/practice/${track}/${encodeURIComponent(s.item_id)}`} className="inline-flex h-10 items-center rounded-lg border border-neutral-300 px-4 text-sm hover:bg-neutral-50">Try it again</a>
-        <a href="/today" className="inline-flex h-10 items-center rounded-lg bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-800">Back to Today</a>
+        <Link href="/" className="inline-flex h-10 items-center rounded-lg bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-800">Back to Today</Link>
       </div>
     </Shell>
   );

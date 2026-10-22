@@ -2,7 +2,7 @@
 export const PROTECTED_PREFIXES = ["/today", "/practice", "/program", "/history", "/settings", "/jobs", "/network", "/life", "/chat"];
 export const SIGN_IN_PATH = "/sign-in";
 export const INVITE_PATH = "/invite";
-export const HOME_AFTER_SIGN_IN = "/today";
+export const HOME_AFTER_SIGN_IN = "/";
 
 export function isProtected(pathname: string) {
   return PROTECTED_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"));

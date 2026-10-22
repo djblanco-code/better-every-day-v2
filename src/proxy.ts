@@ -31,7 +31,7 @@ export async function proxy(request: NextRequest) {
   if (code && request.nextUrl.pathname !== "/auth/callback") {
     const to = new URL("/auth/callback", request.url);
     to.searchParams.set("code", code);
-    to.searchParams.set("next", request.nextUrl.searchParams.get("next") ?? "/today");
+    to.searchParams.set("next", request.nextUrl.searchParams.get("next") ?? "/");
     return NextResponse.redirect(to);
   }
   // sessionUser() verifies the JWT signature locally (asymmetric keys); getSession() would trust the cookie blindly.

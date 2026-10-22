@@ -3,6 +3,7 @@ import { Shell } from "../shell";
 import { useEffect, useState, useTransition } from "react";
 import { getToday, logMinutes, markDone, setTimeAvailable, swapSlot, tickHabit, type TodayData } from "./actions";
 import { CheckinForm } from "../life/checkin-form";
+import { JournalCard } from "../journal/journal-card";
 import type { SlotView } from "@/lib/recall/plan";
 import type { Track } from "@/lib/recall/types";
 import { ENERGY, MOOD, TIME_OPTIONS, money } from "@/lib/life/types";
@@ -13,7 +14,7 @@ const localDate = () => { const d = new Date(); return `${d.getFullYear()}-${Str
 // Today = your day: check in, what needs you, the Recall plan sized to the time you have, habits, and a glance
 // at readiness and money. The plan itself never changes shape (the engine owns it); only what is asked of
 // you today does.
-export function TodayClient({ email }: { email: string }) {
+export function TodayClient({ email, counts, top }: { email: string; counts: { apps: number; interviewing: number; people: number; events: number }; top?: React.ReactNode }) {
   const [data, setData] = useState<TodayData | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const [extra, setExtra] = useState("");
@@ -44,10 +45,11 @@ export function TodayClient({ email }: { email: string }) {
 
   return (
     <Shell>
+      {top}
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-sm text-neutral-500">{dateLabel} · Week {plan.week}</p>
-          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">Today</h1>
+          <p className="text-sm text-neutral-500">Week {plan.week} of the program</p>
+          <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{dateLabel}</h1>
         </div>
         <form action="/auth/sign-out" method="post"><button className="text-sm text-neutral-500 hover:underline">{email} · Sign out</button></form>
       </header>
@@ -101,6 +103,9 @@ export function TodayClient({ email }: { email: string }) {
               </div>
             </section>
           ) : <p className="text-sm text-neutral-500">No habits yet. <a href="/life" className="underline">Add a couple in Life</a> and they show up here each day.</p>}
+
+          {/* 5. End of day: the journal. What it finds lands in Network, Recall and Life. */}
+          <JournalCard onSaved={() => run(() => getToday(localDate()))} />
         </div>
 
         {/* 5. At a glance. */}
@@ -126,6 +131,14 @@ export function TodayClient({ email }: { email: string }) {
                 </div>
               ))}
             </div>
+          </section>
+          <section className="rounded-2xl border border-neutral-200 bg-white p-5">
+            <h2 className="font-medium">Where things stand</h2>
+            <ul className="mt-2 space-y-1.5 text-sm">
+              <li className="flex justify-between"><a href="/jobs" className="hover:underline">Jobs</a><span className="text-neutral-600">{counts.apps} applied · {counts.interviewing} in interviews</span></li>
+              <li className="flex justify-between"><a href="/network" className="hover:underline">Network</a><span className="text-neutral-600">{counts.people} people · {counts.events} events</span></li>
+              <li className="flex justify-between"><a href="/program" className="hover:underline">Program</a><span className="text-neutral-600">week {plan.week} · {summary.streak} day streak</span></li>
+            </ul>
           </section>
           <a href="/life" className="block rounded-2xl border border-neutral-200 bg-white p-5 hover:shadow-md">
             <div className="flex items-baseline justify-between"><h2 className="font-medium">Money this month</h2><span className="text-sm text-neutral-500">Life →</span></div>
