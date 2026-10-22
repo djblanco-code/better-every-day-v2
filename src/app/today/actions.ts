@@ -10,6 +10,7 @@ import { planView, summary, type PlanView, type Summary } from "@/lib/recall/pla
 import type { PracticeSlot } from "@/lib/recall/types";
 import { sessionUser } from "@/lib/supabase/session";
 import { dueToday, type Checkin, type Habit } from "@/lib/life/types";
+import { planningDay, type DayPlan, type Goal } from "@/lib/goals/types";
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -36,13 +37,16 @@ export interface DayExtras {
   habits: { habit: Habit; done: boolean }[];      // active habits due today
   due: DueItem[];                                  // assessments, intro calls, network follow-ups
   spent_cents: number; limit_cents: number;        // money, this month
+  goals: Goal[];                                   // active goals, most important first
+  plan_day: string;                                // the planning day (06:00 America/New_York rollover)
+  day_plan: DayPlan | null;                        // today's answers, or null until the ritual is done
 }
 export interface TodayData { plan: PlanView; summary: Summary; today: string; day: DayExtras }
 
 /** Everything on Today that is not the Recall plan. One parallel fetch; each table is RLS-scoped. */
 async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras> {
   const today = c.today, soon = (() => { const d = new Date(today + "T12:00"); d.setDate(d.getDate() + 3); return d.toISOString().slice(0, 10); })();
-  const [ck, hb, hl, na, as, ac, pp, tx, bg] = await Promise.all([
+  const [ck, hb, hl, na, as, ac, pp, tx, bg, gl, dp] = await Promise.all([
     c.supabase.from("checkins").select("date,sleep_hours,energy,mood,exercise_minutes,weight,time_available,note").eq("date", today).maybeSingle(),
     c.supabase.from("habits").select("id,name,icon,cadence,target_per_week,active,sort").eq("active", true).order("sort"),
     c.supabase.from("habit_logs").select("habit_id,done").eq("date", today),
@@ -52,6 +56,8 @@ async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras>
     c.supabase.from("people").select("id,name,company,follow_up,follow_up_done").eq("follow_up_done", false).neq("follow_up", ""),
     c.supabase.from("transactions").select("amount_cents").eq("kind", "expense").gte("date", today.slice(0, 7) + "-01"),
     c.supabase.from("budgets").select("limit_cents"),
+    c.supabase.from("goals").select("id,area,title,why,priority,active").eq("active", true).order("priority"),
+    c.supabase.from("day_plans").select("day,time_available,energy,focus_goal_id,note").eq("day", planningDay()).maybeSingle(),
   ]);
   const doneIds = new Set(((hl.data ?? []) as { habit_id: string; done: boolean }[]).filter((l) => l.done).map((l) => l.habit_id));
   const habits = ((hb.data ?? []) as Habit[]).filter((h) => dueToday(h, today)).map((habit) => ({ habit, done: doneIds.has(habit.id) }));
@@ -75,7 +81,28 @@ async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras>
     habits, due: due.slice(0, 10),
     spent_cents: ((tx.data ?? []) as { amount_cents: number }[]).reduce((a, t) => a + t.amount_cents, 0),
     limit_cents: ((bg.data ?? []) as { limit_cents: number }[]).reduce((a, b) => a + b.limit_cents, 0),
+    goals: (gl.data ?? []) as Goal[],
+    plan_day: planningDay(),
+    day_plan: (dp.data as DayPlan | null) ?? null,
   };
+}
+
+/** The daily plan ritual: time, the goal that gets today, energy. Once per planning day; the answers also land on
+ *  today's check-in so the hour is sized the same way everywhere. */
+export async function makeDayPlan(input: { time_available: number; focus_goal_id: string | null; energy: number | null; sleep_hours?: number | null }, clientDate?: string): Promise<TodayData> {
+  const r = parse(z.object({ time_available: z.number().int().min(0).max(600), focus_goal_id: idS.nullable(), energy: z.number().int().min(1).max(5).nullable(), sleep_hours: z.number().min(0).max(24).nullable().optional() }), input);
+  const c = await ctx(clientDate);
+  const day = planningDay();
+  const { error } = await c.supabase.from("day_plans").upsert({ user_id: c.user.id, day, time_available: r.time_available, energy: r.energy, focus_goal_id: r.focus_goal_id, note: "" });
+  if (error) throw new Error(error.message);
+  const { data: cur } = await c.supabase.from("checkins").select("*").eq("date", c.today).maybeSingle();
+  const patch: Record<string, unknown> = { time_available: r.time_available };
+  if (r.energy != null) patch.energy = r.energy;
+  if (r.sleep_hours != null) patch.sleep_hours = r.sleep_hours;
+  await c.supabase.from("checkins").upsert({ ...(cur ?? {}), ...patch, user_id: c.user.id, date: c.today, updated_at: new Date().toISOString() });
+  revalidatePath("/"); revalidatePath("/life");
+  const plan = c.st.plans[c.today] ?? buildPlan(c.st, c.banks, c.cur, c.today);
+  return out(c, plan);
 }
 async function out(c: Awaited<ReturnType<typeof ctx>>, plan: Parameters<typeof planView>[0]): Promise<TodayData> {
   return { plan: planView(plan, c.st, c.cur, c.today), summary: summary(c.st, c.banks, c.cur, c.today), today: c.today, day: await dayExtras(c) };

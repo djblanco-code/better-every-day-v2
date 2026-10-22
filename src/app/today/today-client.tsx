@@ -2,7 +2,9 @@
 import Link from "next/link";
 import { Shell } from "../shell";
 import { useEffect, useState, useTransition } from "react";
-import { getToday, logMinutes, markDone, setTimeAvailable, swapSlot, tickHabit, type TodayData } from "./actions";
+import { getToday, logMinutes, makeDayPlan, markDone, setTimeAvailable, swapSlot, tickHabit, type TodayData } from "./actions";
+import { DayPlanCard } from "./day-plan-card";
+import { areaLabel } from "@/lib/goals/types";
 import { CheckinForm } from "../life/checkin-form";
 import { JournalCard } from "../journal/journal-card";
 import type { SlotView } from "@/lib/recall/plan";
@@ -37,7 +39,7 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
   const greeting = morning ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
   const dateLabel = new Date(data.today + "T12:00").toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
   const pct = Math.min(100, Math.round((100 * plan.minutes_done) / plan.target));
-  const checkinOpen = showCheckin ?? (morning && !checkedIn);
+  const checkinOpen = showCheckin ?? (morning && !checkedIn && !!day.day_plan);
 
   const budget = ck?.time_available ?? null;
   const lowEnergy = !!ck?.energy && ck.energy <= 2 && budget == null;
@@ -53,6 +55,7 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
     day.habits.length ? `habits ${habitsDone}/${day.habits.length}` : null,
     day.spent_cents ? `${money(day.spent_cents)} spent this month` : null,
   ].filter(Boolean);
+  const focus = day.day_plan?.focus_goal_id ? day.goals.find((g) => g.id === day.day_plan!.focus_goal_id) ?? null : null;
 
   return (
     <Shell width="wide">
@@ -68,7 +71,17 @@ export function TodayClient({ email, counts, top }: { email: string; counts: { a
         </div>
       </header>
 
-      {elsewhere.length ? <p className="rise rise-2 text-sm text-neutral-600">{elsewhere.map((t, i) => <span key={i}>{i ? " · " : ""}{t}</span>)} · <Link href="/jobs/pipeline" className="underline">Jobs</Link> · <Link href="/network" className="underline">Network</Link> · <Link href="/life" className="underline">Life</Link></p> : null}
+      {elsewhere.length ? <p className="rise rise-2 text-sm text-neutral-600">{elsewhere.map((t, i) => <span key={i}>{i ? " · " : ""}{t}</span>)} · <Link href="/jobs/pipeline" className="underline">Jobs</Link> · <Link href="/network" className="underline">Network</Link> · <Link href="/life" className="underline">Life</Link> · <Link href="/goals" className="underline">Goals</Link></p> : null}
+
+      {/* The daily plan: asked once per planning day (06:00 New York), then one line until tomorrow. */}
+      {day.day_plan ? (
+        <section className="rise rise-2 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm">
+          <p><span className="font-medium">Today:</span> {day.day_plan.time_available} min{focus ? <> · for <span className="font-medium">{focus.title}</span> <span className="text-neutral-500">({areaLabel(focus.area)})</span></> : day.goals.length ? "" : <> · <Link href="/goals" className="underline">set your goals</Link></>}{day.day_plan.energy ? ` · energy ${ENERGY[day.day_plan.energy].toLowerCase()}` : ""}</p>
+          <button className="text-neutral-600 hover:underline" onClick={() => run(async () => { await makeDayPlan({ time_available: 0, focus_goal_id: null, energy: null }, localDate()); return getToday(localDate()); })}>Change</button>
+        </section>
+      ) : (
+        <DayPlanCard goals={day.goals} pending={pending} defaultTime={budget ?? 60} onDone={(v) => run(() => makeDayPlan(v, localDate()))} />
+      )}
 
       {/* Morning: check in. Evening: it folds to one line. */}
       <section className={`rise rise-2 rounded-2xl border bg-white p-4 sm:p-5 ${checkinOpen ? "border-accent/40" : "border-neutral-200"}`}>

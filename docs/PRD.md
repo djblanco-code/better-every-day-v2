@@ -101,6 +101,20 @@ Sources: Sunsama's morning ritual (short fixed sequence, realistic commitment, s
 tasks + habits in one view; contribution-style habit grids; budget dashboards that lead with the period and
 the remaining decision before analytics.
 
+### 4.7 Goals and the daily plan (phase 9)
+Goal: the day starts with a question, not a dashboard, and the plan bends to the answer.
+- G1. **Goals questionnaire** (`/goals`, once, editable): seven questions, under five minutes, shaped by WOOP
+  (wish → what done looks like per area → obstacle → if-then plan) plus two constraints (hours a week, best time
+  and days off). Up to three areas, one goal each. Research: implementation intentions raise goal attainment
+  (d ≈ .61, Gollwitzer & Sheeran 2006); onboarding questionnaires should stay under ten mixed questions.
+- G2. **Daily plan ritual**: Home asks "Let's make your daily plan": how much time today, which goal gets today,
+  how much energy. Three taps. Asked once per planning day and then shown as one line with "Change".
+- G3. **Planning day** rolls over at 06:00 America/New_York, so a 1 a.m. session still belongs to the day before.
+- G4. **The plan bends**: time trims the hour (slots past it wait as "if time allows"); the focus goal is what
+  the page leads with; energy 1-2 shortens the hour to 40 minutes with the review first. The engine's plan is
+  never rewritten (golden tests stay valid); only what is asked of you today changes.
+- G5. With no goals yet, the ritual still asks time and energy and points at the questionnaire.
+
 ### 4.5 Chat (the Claude wrapper, phase 2+)
 - C1. A chat page with the user's own key, streaming, with tools scoped per request (read-only by default).
 - C2. Orchestrator routes to Memory / Recall coach / Jobs / Network agents; each has its own prompt, output
@@ -130,7 +144,9 @@ use_count, pinned, archived_at) · `applications`(user_id, company, role, url, s
 search_id) · `people`, `events`, `audit_log`(user_id, agent, tool, input_hash, result, tokens, cost_cents) ·
 `habits`(user_id, id, name, cadence, target_per_week, active) · `habit_logs`(user_id, habit_id, date, done) ·
 `checkins`(user_id, date, sleep_hours, energy, mood, exercise_minutes, weight, time_available) ·
-`transactions`(user_id, id, date, kind, amount_cents, category, merchant) · `budgets`(user_id, category, limit_cents).
+`transactions`(user_id, id, date, kind, amount_cents, category, merchant) · `budgets`(user_id, category, limit_cents) ·
+`goals`(user_id, id, area, title, why, priority, active) · `goal_profile`(user_id, wish, obstacle, if_then, hours_per_week, best_time, days_off) ·
+`day_plans`(user_id, day, time_available, energy, focus_goal_id).
 Every table: `user_id` + RLS.
 
 ## 7. Success metrics

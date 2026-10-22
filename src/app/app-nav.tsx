@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 // One navigation for every signed-in page: a top bar on wide screens, a thumb-reachable bottom tab bar on phones
 // (44px+ targets, safe-area padding for the iPhone home indicator). Hidden on sign-in, invite and the landing page.
 const TABS: { href: string; label: string; icon: string; match: (p: string) => boolean; desktopOnly?: boolean }[] = [
-  { href: "/", label: "Home", icon: "⌂", match: (p) => p === "/" || p.startsWith("/today") || p.startsWith("/practice") || p.startsWith("/history") || p.startsWith("/program") },
+  { href: "/", label: "Home", icon: "⌂", match: (p) => p === "/" || p.startsWith("/today") || p.startsWith("/practice") || p.startsWith("/history") || p.startsWith("/program") || p.startsWith("/goals") },
   { href: "/jobs", label: "Jobs", icon: "▤", match: (p) => p.startsWith("/jobs") },
   { href: "/network", label: "Network", icon: "⚭", match: (p) => p.startsWith("/network") },
   { href: "/life", label: "Life", icon: "☀", match: (p) => p.startsWith("/life") },
