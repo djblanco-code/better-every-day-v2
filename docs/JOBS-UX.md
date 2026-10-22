@@ -30,13 +30,16 @@ rules (interview, assessment, rejection, offer, other) and proposes a change. Th
 
 ## 3. Information architecture after the redesign
 
-- **Pipeline** (`/jobs`, the landing page): search window + inline "new search"; **Needs you** (next actions due or
+- **Insights** (`/jobs`, the landing page, by the owner's choice): headline tiles (applications, last 7 days vs
+  prior 7, response rate, interview rate, median days to first reply), applications per week, how far they got
+  (sorted horizontal bars with conversion from the previous step), where everything stands, by sender. Every
+  chart has a table view. A banner links to the Pipeline when something needs you.
+- **Pipeline** (`/jobs/pipeline`): search window + inline "new search"; **Needs you** (next actions due or
   overdue, assessments and calls due, stale applications with nudge/ghost buttons); stage chips that filter the
   **Applications** table below; row click opens the card (stage, next action + date, notes, history).
 - **Board** (`/jobs/board`): the same applications as a Kanban. Drag = stage change.
 - **Leads** (`/jobs/todo`): roles the agent could not submit, add by link.
 - **Mail** (`/jobs/mail`): suggestions from the inbox; confirm or dismiss.
-- **Insights** (`/jobs/insights`): the old overview charts and the funnel, per search window.
 - `/jobs/all` and `/jobs/action` redirect to Pipeline; their content lives there.
 
 Stage labels in plain words: Applied · Intro call · Interviewing · Final round · Offer · No reply · Rejected · I passed.
@@ -54,7 +57,16 @@ Stage labels in plain words: Applied · Intro call · Interviewing · Final roun
   pleased to offer|extend an offer" → offer; else other. Company match: tracker company name (lower-cased,
   first word of 4+ letters) in sender address, sender name or subject.
 
-## 5. Sources
+## 5. Charts: how they are built (dataviz method)
+- Form by job: a handful of headline numbers → stat tiles; magnitude over time → one-series bars; stage reach →
+  sorted horizontal bars, not a trapezoid funnel (bar length stays honest; the trapezoid adds no information).
+- One hue for data; identity lives in the labels. Text never wears the data color. Thin marks, 4px rounded data
+  ends, 2px gaps, recessive gridlines, labels only on the max and the latest week, hover tooltip on every mark.
+- Dark mode steps the same hue (#2a78d6 → #3987e5). A table view exists for every chart.
+- Metrics (src/lib/jobs/metrics.ts, unit-tested): response rate = any reply incl. rejection; interview rate =
+  reached Interviewing or later; days to first reply = applied → first stage change, median.
+
+## 6. Sources
 - Callings job tracker docs (board shows what needs attention): https://www.callings.ai/docs/job-tracker/kanban-view
 - Job Wizard, "a tracker should be a next-action list", keep a next-action date on every card:
   https://jobwizard.ai/blog/how-to-track-job-applications-with-a-kanban-board-chrome-extension
@@ -63,3 +75,7 @@ Stage labels in plain words: Applied · Intro call · Interviewing · Final roun
 - Huntr vs Teal (vendor): https://huntr.co/blog/huntr-vs-teal
 - Prentus, best job tracker tools: https://prentus.com/blog/best-job-tracker-tools
 - ImapFlow (Gmail IMAP from Node, app password + 2FA): https://socket.dev/npm/package/imapflow/overview/2.0.1
+- ApplyTrack analytics docs (response rate within 21 days, interview rate, time to first response): https://mintlify.com/philtechphilips/applytrack/guides/understanding-analytics
+- Litespace, tracking job-application success with data: https://www.litespace.io/blog/how-to-track-your-job-application-success-with-data-analytics
+- Dundas, funnel chart vs horizontal bars: https://dundas.com/support/learning/documentation/data-visualizations/how-to/creating-a-funnel-chart
+- Analytics Demystified, funnel visualizations that make sense: https://analyticsdemystified.com/2014/05/06/funnel-visualizations-that-make-sense/

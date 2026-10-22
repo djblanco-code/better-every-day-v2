@@ -76,4 +76,5 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 ## Phase 7 — Job Tracker that drives action (docs/JOBS-UX.md)
 - [x] 7.1 Pipeline landing page: needs-you list (dated next actions, assessments, calls), gone-quiet list with Nudge / No reply, stage chips + table; next action + date on every application; inline "new search"; `/jobs/all` folded in; Insights holds the charts.
 - [x] 7.2 Mail: Gmail app password in the Vault (Settings), IMAP check of the last 14 days, rule-based classification, suggestions you confirm (`/jobs/mail`).
-- [ ] 7.3 Daily mail check from the cron once the owner has set it up and the first manual checks look right.
+- [x] 7.3 Insights is the landing page again (owner's call), rebuilt with the dataviz method: stat tiles, weekly bars, sorted horizontal bars for reach and stage, by-sender table, table view toggle; metrics module with tests.
+- [ ] 7.4 Daily mail check from the cron once the owner has set it up and the first manual checks look right.
