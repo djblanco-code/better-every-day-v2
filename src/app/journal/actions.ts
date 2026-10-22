@@ -8,7 +8,7 @@ import { newId } from "@/lib/jobs/store";
 // out: mock/real interviews and study -> external_reps (Recall); people/events -> Network. Without a key the note is
 // kept raw. Page content is data: the parser only ever sees the user's own words.
 
-export const PARSER_VERSION = 2;
+const PARSER_VERSION = 2;
 const PARSER = `You turn a job-seeker's end-of-day note into structured items. Return ONLY a JSON object:
 {"summary": one sentence in the second person ("You did ..."),
  "items": [ ... ]}
