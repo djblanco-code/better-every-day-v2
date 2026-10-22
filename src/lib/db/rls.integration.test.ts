@@ -1,5 +1,6 @@
 // Integration test for Row Level Security on public.users (task 0.6).
-// Runs only when SUPABASE_SECRET_KEY is present (never in the browser, never committed): it creates two throwaway
+// Runs only when SUPABASE_SECRET_KEY is present: in CI against a throwaway local Supabase (job "rls" in ci.yml), or
+// locally against your own project if you export the secret for one shell. It creates two throwaway
 // users with the admin API, signs each in, and proves A cannot read B. Skipped otherwise so `npm test` stays green.
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createClient } from "@supabase/supabase-js";
@@ -51,6 +52,23 @@ describe.skipIf(!enabled)("RLS on public.users", () => {
     expect(data).toEqual([]);
     const check = (await admin.from("users").select("invited").eq("id", ids[1]).single()).data as { invited: boolean } | null;
     expect(check?.invited).toBe(false);
+  });
+
+  it("a data table (applications) and the jobs RPC are isolated the same way", async () => {
+    // Service role bypasses RLS: plant one application for A.
+    const row = { user_id: ids[0], id: `app-${stamp}`, company: "Acme", role: "SWE", applied_on: "2026-01-01", stage: "applied", kind: "applied" };
+    const { error: ins } = await admin.from("applications").insert(row);
+    expect(ins).toBeNull();
+    const asB = createClient(url!, anon!, { auth: { persistSession: false } });
+    await asB.auth.signInWithPassword(b);
+    expect((await asB.from("applications").select("id")).data).toEqual([]);
+    const viaB = (await asB.rpc("get_jobs_state")).data as { applications: unknown[] } | null;
+    expect(viaB?.applications).toEqual([]);
+    const asA = createClient(url!, anon!, { auth: { persistSession: false } });
+    await asA.auth.signInWithPassword(a);
+    expect((await asA.from("applications").select("id")).data).toEqual([{ id: row.id }]);
+    const viaA = (await asA.rpc("get_jobs_state")).data as { applications: { id: string }[] } | null;
+    expect(viaA?.applications.map((x) => x.id)).toEqual([row.id]);
   });
 
   it("anonymous requests get nothing", async () => {
