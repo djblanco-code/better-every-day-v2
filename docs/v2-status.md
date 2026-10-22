@@ -1,4 +1,4 @@
-# Status after Phase 7 (2026-10-22)
+# Status after the soul pass (2026-10-22)
 
 Everything in Phases 0-3 that does not need the owner's accounts is built, merged and live (31 PRs, CI green on each).
 
@@ -11,6 +11,11 @@ Phase 5 (system-design review, docs/ASSESSMENT.md §7): RLS policies evaluate `a
 verify locally (no Auth round trip per page), the Jobs pages load in one RPC, a daily cron keeps the free database
 awake, Speed Insights records real-user Core Web Vitals, and CI proves row isolation on every PR against a throwaway
 local Supabase.
+
+Phase 8 (docs/SOUL.md): "one hour a day until you're hired." Fraunces for titles, Inter for the body, warm
+paper and a designed dark set, one accent for the next thing to do. Home is three things: check-in, the hour, the
+journal. Day zero is one card with one button; mornings open the check-in, evenings lead with the journal, a
+finished hour folds into one line. Insights keeps three numbers.
 
 Phase 7 (docs/JOBS-UX.md): the Job Tracker is a next-action list. Insights lands you on the numbers that matter
 (response rate, interview rate, days to first reply, weekly volume); Pipeline holds what needs you and what went
