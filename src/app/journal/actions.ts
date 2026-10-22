@@ -1,4 +1,6 @@
 "use server";
+import { id as idS, isoDate, longText, parse } from "@/lib/validate";
+import { clientDate as cd } from "@/lib/validate";
 import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabase/server";
 import { callModel, NoKey } from "@/lib/ai/callModel";
@@ -29,8 +31,7 @@ const SCHEMA = { type: "object", additionalProperties: false, required: ["summar
 
 export interface Item { type: string; date?: string; id?: string; [k: string]: unknown }
 export interface Entry { id: string; date: string; time: string; text: string; summary: string | null; items: Item[]; parse_error: string; parser: number }
-const DATE = /^\d{4}-\d{2}-\d{2}$/;
-const validDate = (d?: string) => { const s = new Date().toISOString().slice(0, 10); return d && DATE.test(d) && Math.abs(Date.parse(d) - Date.parse(s)) <= 86400000 ? d : s; };
+const validDate = (d?: string) => cd(d);
 
 async function ctx() {
   const supabase = await supabaseServer();
@@ -47,7 +48,7 @@ export async function getJournal(): Promise<{ entries: Entry[]; has_key: boolean
 
 export async function addEntry(text: string, clientDate?: string): Promise<Entry> {
   const { supabase, uid } = await ctx();
-  const t = (text ?? "").trim().slice(0, 4000);
+  const t = parse(longText(4000), text ?? "").trim();
   if (t.length < 3) throw new Error("Say or type what happened first.");
   const date = validDate(clientDate);
   let summary: string | null = null, items: Item[] = [], err = "";
@@ -55,7 +56,7 @@ export async function addEntry(text: string, clientDate?: string): Promise<Entry
     const weekday = new Date(date + "T12:00").toLocaleDateString("en-US", { weekday: "long" });
     const r = await callModel<{ summary: string; items: Item[] }>(supabase, uid, { agent: "journal", system: PARSER, user: `Today is ${date} (${weekday}).\n\nNote:\n${t}`, schema: SCHEMA, maxTokens: 1500 });
     summary = String(r.data.summary ?? ""); items = (r.data.items ?? []).filter((i) => i && i.type).slice(0, 20);
-    for (const i of items) if (!DATE.test(String(i.date ?? ""))) i.date = date;
+    for (const i of items) if (!isoDate.safeParse(String(i.date ?? "")).success) i.date = date;
   } catch (e) {
     err = e instanceof NoKey ? "" : String((e as Error)?.message ?? e).slice(0, 200);
   }
@@ -78,6 +79,7 @@ export async function addEntry(text: string, clientDate?: string): Promise<Entry
 /** Remove an entry and everything it created. */
 export async function deleteEntry(id: string): Promise<{ ok: true }> {
   const { supabase } = await ctx();
+  id = parse(idS, id);
   const { data } = await supabase.from("journal_entries").select("items").eq("id", id).maybeSingle();
   const ids = ((data?.items ?? []) as Item[]).map((i) => i.id).filter(Boolean) as string[];
   await Promise.all([supabase.from("people").delete().eq("entry_id", id), supabase.from("events").delete().eq("entry_id", id), ids.length ? supabase.from("external_reps").delete().in("id", ids) : Promise.resolve(), supabase.from("journal_entries").delete().eq("id", id)]);

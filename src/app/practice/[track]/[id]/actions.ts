@@ -1,4 +1,5 @@
 "use server";
+import { id as idS, longText, parse, track as trackS } from "@/lib/validate";
 import { supabaseServer } from "@/lib/supabase/server";
 import { TRACKS, type Track } from "@/lib/recall/types";
 
@@ -7,6 +8,7 @@ const isTrack = (t: string): t is Track => (TRACKS as string[]).includes(t);
 /** Autosave the draft (debounced on the client). Returns the server timestamp so the client can show "saved". */
 export async function saveDraft(track: string, itemId: string, text: string, startedAt: string | null): Promise<{ saved_at: string }> {
   if (!isTrack(track)) throw new Error("bad track");
+  track = parse(trackS, track); itemId = parse(idS, itemId); text = parse(longText(50000), text ?? ""); startedAt = startedAt == null ? null : parse(longText(40), startedAt);
   const supabase = await supabaseServer();
   const { data } = await supabase.auth.getUser();
   if (!data.user) throw new Error("signed out");

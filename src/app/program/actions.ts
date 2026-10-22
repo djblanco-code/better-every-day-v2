@@ -1,4 +1,5 @@
 "use server";
+import { clientDate as cd } from "@/lib/validate";
 import { supabaseServer } from "@/lib/supabase/server";
 import { loadBanks } from "@/lib/recall/banks";
 import { loadState, saveProgram } from "@/lib/recall/store";
@@ -6,8 +7,7 @@ import { addDays, weekNo } from "@/lib/recall/engine";
 import { metrics, type Metrics } from "@/lib/recall/metrics";
 import type { Curriculum } from "@/lib/recall/types";
 
-const DATE = /^\d{4}-\d{2}-\d{2}$/;
-const validDate = (d?: string) => { const s = new Date().toISOString().slice(0, 10); return d && DATE.test(d) && Math.abs(Date.parse(d) - Date.parse(s)) <= 86400000 ? d : s; };
+const validDate = (d?: string) => cd(d);
 
 export interface ProgramData {
   today: string; week: number; of: number; phase: string; start: string | null; end: string | null; daily_minutes: number;

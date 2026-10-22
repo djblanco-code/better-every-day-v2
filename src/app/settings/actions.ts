@@ -1,4 +1,6 @@
 "use server";
+import { z } from "zod";
+import { isoDate, parse, shortText } from "@/lib/validate";
 import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabase/server";
 import { callModel, DEFAULT_MODEL, type Provider } from "@/lib/ai/callModel";
@@ -36,6 +38,7 @@ export async function getSettings(): Promise<SettingsView> {
 /** Save provider/model/focus/timer. The key, if given, goes straight into the Vault via set_ai_key and is never echoed. */
 export async function saveSettings(input: { provider: Provider; model: string; company_focus: string; default_minutes: number; api_key?: string; program_start?: string | null }): Promise<{ ok: true; key_hint: string | null }> {
   const { supabase, user } = await ctx();
+  input = parse(z.object({ provider: z.enum(["anthropic", "gemini"]), model: shortText(80), company_focus: shortText(60), default_minutes: z.number().int(), api_key: z.string().max(400).optional(), program_start: isoDate.nullable().optional() }), { ...input, program_start: input.program_start || null });
   const provider: Provider = input.provider === "gemini" ? "gemini" : "anthropic";
   const model = (input.model || "").trim().slice(0, 80) || DEFAULT_MODEL[provider];
   const { error } = await supabase.from("ai_settings").upsert(
