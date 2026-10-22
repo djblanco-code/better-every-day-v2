@@ -8,6 +8,7 @@ import { loadState, savePlan, saveProgram } from "@/lib/recall/store";
 import { buildPlan, recommend } from "@/lib/recall/engine";
 import { planView, summary, type PlanView, type Summary } from "@/lib/recall/plan";
 import type { PracticeSlot } from "@/lib/recall/types";
+import { sessionUser } from "@/lib/supabase/session";
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -21,7 +22,7 @@ function validDate(d: string | undefined): string {
 
 async function ctx(today?: string) {
   const supabase = await supabaseServer();
-  const { data } = await supabase.auth.getUser();
+  const data = await sessionUser(supabase);
   if (!data.user) throw new Error("signed out");
   const d = validDate(today);
   const [{ banks, cur }, st] = await Promise.all([loadBanks(supabase), loadState(supabase, d)]);

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabase/server";
 import { callModel, NoKey } from "@/lib/ai/callModel";
 import { newId } from "@/lib/jobs/store";
+import { sessionUser } from "@/lib/supabase/session";
 
 // The daily journal (port of v1 journal.py). A note is parsed into typed items with the user's own key and fanned
 // out: mock/real interviews and study -> external_reps (Recall); people/events -> Network. Without a key the note is
@@ -35,7 +36,7 @@ const validDate = (d?: string) => cd(d);
 
 async function ctx() {
   const supabase = await supabaseServer();
-  const { data } = await supabase.auth.getUser();
+  const data = await sessionUser(supabase);
   if (!data.user) throw new Error("signed out");
   return { supabase, uid: data.user.id };
 }

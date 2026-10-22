@@ -4,6 +4,7 @@ import { id as idS, isoDate, longText, parse, shortText } from "@/lib/validate";
 import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabase/server";
 import { newId } from "@/lib/jobs/store";
+import { sessionUser } from "@/lib/supabase/session";
 
 export interface Person { id: string; entry_id: string | null; date: string | null; name: string; company: string; role: string; relationship: "contact" | "mentor" | "recruiter" | "peer"; met_at: string; how_they_can_help: string; follow_up: string; follow_up_done: boolean; email: string; linkedin: string; notes: string }
 export interface Event { id: string; entry_id: string | null; date: string | null; name: string; kind: string; org: string; notes: string; people?: number }
@@ -11,7 +12,7 @@ export interface NetworkState { people: Person[]; events: Event[]; follow_ups: P
 
 async function ctx() {
   const supabase = await supabaseServer();
-  const { data } = await supabase.auth.getUser();
+  const data = await sessionUser(supabase);
   if (!data.user) throw new Error("signed out");
   return { supabase, uid: data.user.id };
 }

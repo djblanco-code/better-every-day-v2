@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
 import type { Track } from "@/lib/recall/types";
+import { sessionUser } from "@/lib/supabase/session";
 
 const TRACK_NAME: Record<Track, string> = { leetcode: "LeetCode", python: "Python", system_design: "System Design", dsa: "Data Structures & Algorithms", debugging: "Debugging" };
 const tone = (s: number) => (s >= 8 ? "#16a34a" : s >= 5 ? "#d97706" : "#dc2626");
@@ -11,7 +12,7 @@ export const dynamic = "force-dynamic";
 export default async function Result({ params }: { params: Promise<{ sid: string }> }) {
   const { sid } = await params;
   const supabase = await supabaseServer();
-  const { data: auth } = await supabase.auth.getUser();
+  const auth = await sessionUser(supabase);
   if (!auth.user) redirect(SIGN_IN_PATH);
   const { data: s } = await supabase.from("sessions").select("*").eq("id", sid).maybeSingle();
   if (!s) notFound();

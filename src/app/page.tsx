@@ -5,6 +5,7 @@ import { loadState } from "@/lib/recall/store";
 import { summary } from "@/lib/recall/plan";
 import { ACTIVE } from "@/lib/jobs/types";
 import { HomeClient } from "./home-client";
+import { sessionUser } from "@/lib/supabase/session";
 
 // Signed out: a short landing with sign-in. Signed in: the launcher (journal + the three apps with live counts).
 export const dynamic = "force-dynamic";
@@ -13,7 +14,7 @@ export default async function Home() {
   let host: string | null = null, problem: string | null = null;
   try { host = new URL(publicEnv().NEXT_PUBLIC_SUPABASE_URL).host; } catch (e) { problem = e instanceof Error ? e.message : String(e); }
   const supabase = host ? await supabaseServer() : null;
-  const user = supabase ? (await supabase.auth.getUser()).data.user : null;
+  const user = supabase ? (await sessionUser(supabase)).user : null;
   if (!user || !supabase) {
     return (
       <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-4 px-6">

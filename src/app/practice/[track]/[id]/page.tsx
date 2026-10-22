@@ -5,6 +5,7 @@ import { findItem, loadBanks } from "@/lib/recall/banks";
 import { statementFor } from "@/lib/recall/statement";
 import { TRACKS, type Track } from "@/lib/recall/types";
 import { SessionClient } from "./session-client";
+import { sessionUser } from "@/lib/supabase/session";
 
 // A session is one document: the problem on top, your writing below. Nothing runs. The timer starts only on Start.
 export const dynamic = "force-dynamic";
@@ -13,7 +14,7 @@ export default async function Session({ params }: { params: Promise<{ track: str
   const { track, id } = await params;
   if (!(TRACKS as string[]).includes(track)) notFound();
   const supabase = await supabaseServer();
-  const { data } = await supabase.auth.getUser();
+  const data = await sessionUser(supabase);
   if (!data.user) redirect(SIGN_IN_PATH);
   const { banks, premium, statements } = await loadBanks(supabase);
   const item = findItem(banks, track as Track, decodeURIComponent(id));
