@@ -59,7 +59,7 @@ async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras>
     c.supabase.from("transactions").select("amount_cents").eq("kind", "expense").gte("date", today.slice(0, 7) + "-01"),
     c.supabase.from("budgets").select("limit_cents"),
     c.supabase.from("goals").select("id,area,title,why,priority,active").eq("active", true).order("priority"),
-    c.supabase.from("day_plans").select("day,time_available,energy,focus_goal_id,note").eq("day", planningDay()).maybeSingle(),
+    c.supabase.from("day_plans").select("day,time_available,energy,focus_goal_id,note,allocations,busy_until,suggested_minutes,summary").eq("day", planningDay()).maybeSingle(),
     c.supabase.from("applications").select("id", { count: "exact", head: true }).eq("kind", "todo").eq("todo_status", "open"),
     c.supabase.from("applications").select("id,stage,applied_on,next_action_on,history").eq("kind", "applied").eq("stage", "applied").is("next_action_on", null).lte("applied_on", (() => { const d = new Date(today + "T12:00"); d.setDate(d.getDate() - 14); return d.toISOString().slice(0, 10); })()),
   ]);
@@ -95,19 +95,19 @@ async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras>
 
 /** The daily plan ritual: time, the goal that gets today, energy. Once per planning day; the answers also land on
  *  today's check-in so the hour is sized the same way everywhere. */
-export async function makeDayPlan(input: { time_available: number; focus_goal_id: string | null; energy: number | null; sleep_hours?: number | null; mood?: number | null; exercise_minutes?: number | null }, clientDate?: string): Promise<TodayData> {
-  const r = parse(z.object({ time_available: z.number().int().min(0).max(600), focus_goal_id: idS.nullable(), energy: z.number().int().min(1).max(5).nullable(), sleep_hours: z.number().min(0).max(24).nullable().optional(), mood: z.number().int().min(1).max(5).nullable().optional(), exercise_minutes: z.number().int().min(0).max(600).nullable().optional() }), input);
+export async function makeDayPlan(input: { time_available: number; focus_goal_id: string | null; energy?: number | null; allocations?: Record<string, number>; busy_until?: string | null; suggested_minutes?: number | null; summary?: string }, clientDate?: string): Promise<TodayData> {
+  const r = parse(z.object({
+    time_available: z.number().int().min(0).max(600), focus_goal_id: idS.nullable(), energy: z.number().int().min(1).max(5).nullable().optional(),
+    allocations: z.record(z.string().max(64), z.number().int().min(0).max(600)).optional(), busy_until: z.string().regex(/^\d{2}:\d{2}$/).nullable().optional(),
+    suggested_minutes: z.number().int().min(0).max(600).nullable().optional(), summary: shortText(240).optional(),
+  }), input);
   const c = await ctx(clientDate);
   const day = planningDay();
-  const { error } = await c.supabase.from("day_plans").upsert({ user_id: c.user.id, day, time_available: r.time_available, energy: r.energy, focus_goal_id: r.focus_goal_id, note: "" });
+  const { error } = await c.supabase.from("day_plans").upsert({ user_id: c.user.id, day, time_available: r.time_available, energy: r.energy ?? null, focus_goal_id: r.focus_goal_id, note: "", allocations: r.allocations ?? {}, busy_until: r.busy_until ?? null, suggested_minutes: r.suggested_minutes ?? null, summary: r.summary ?? "" });
   if (error) throw new Error(error.message);
+  // Time also lands on today's check-in so the hour sizes the same way everywhere.
   const { data: cur } = await c.supabase.from("checkins").select("*").eq("date", c.today).maybeSingle();
-  const patch: Record<string, unknown> = { time_available: r.time_available };
-  if (r.energy != null) patch.energy = r.energy;
-  if (r.sleep_hours != null) patch.sleep_hours = r.sleep_hours;
-  if (r.mood != null) patch.mood = r.mood;
-  if (r.exercise_minutes != null) patch.exercise_minutes = r.exercise_minutes;
-  await c.supabase.from("checkins").upsert({ ...(cur ?? {}), ...patch, user_id: c.user.id, date: c.today, updated_at: new Date().toISOString() });
+  await c.supabase.from("checkins").upsert({ ...(cur ?? {}), time_available: r.time_available, ...(r.energy != null ? { energy: r.energy } : {}), user_id: c.user.id, date: c.today, updated_at: new Date().toISOString() });
   revalidatePath("/"); revalidatePath("/life");
   const plan = c.st.plans[c.today] ?? buildPlan(c.st, c.banks, c.cur, c.today);
   return out(c, plan);

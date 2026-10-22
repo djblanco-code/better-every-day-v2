@@ -1,6 +1,6 @@
 # The soul of the thing (2026-10-22)
 
-One sentence: **one hour a day until you're hired.** Everything on the first screen serves that hour. Jobs's test,
+One sentence: **1% better every day, even with 20 minutes.** (It began as "one hour a day until you're hired"; the owner widened it on 2026-10-22 to anyone with their own goals.) Everything on the first screen serves that hour. Jobs's test,
 not ours: does it feel inevitable, and did someone care about the parts you never see.
 
 ## Who we are designing for (archetypes, reused from docs/JOBS-UX.md and Recall)

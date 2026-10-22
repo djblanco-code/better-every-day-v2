@@ -4,13 +4,13 @@ Status: draft 1, 2026-10-21. Owner: Dominick. Nothing here is code yet.
 Companion files: `TASKS.md` (ordered work), `PROCESS.md` (how each task is executed).
 
 ## 1. One paragraph
-
-A personal web platform, installable on a phone, where a person who is interviewing for software jobs
-spends one hour a day getting measurably better (Recall), keeps every application and its stage in one
-board (Jobs), remembers the people who can help (Network), and tells the app what happened today in
-their own words (Journal) so an AI sorts it into the right place. It is a wrapper around Claude with the
-user's own data and the user's own key, multi-user from day one, with each user's data isolated by the
-database itself.
+Better Every Day helps ambitious people, the overachievers who get spread thin, focus on what is essential
+(inspired by Essentialism). It is for anyone with their own goals, not only engineers. Success is getting 1% better
+every day; even 20 minutes counts. The core experience is a morning check-in: see today and your realistic free
+time, confirm how much you actually have, commit minutes per goal, pick the one essential thing, and get an
+encouraging summary. The job tracker, the interview-prep hour, the network and the life pages are what the goals
+point at; they are not the product. Calm, low friction, no guilt. Check-in data is saved to power personal
+suggestions later.
 
 ## 2. Who it is for
 
@@ -100,6 +100,19 @@ and Today becomes "your day" instead of only the Recall plan.
 Sources: Sunsama's morning ritual (short fixed sequence, realistic commitment, shutdown review); TickTick for
 tasks + habits in one view; contribution-style habit grids; budget dashboards that lead with the period and
 the remaining decision before analytics.
+
+### 4.8 The morning check-in (phase 10, the core experience)
+1. **See today.** "Busy until" (manual now; Google Calendar when the OAuth client exists) proposes realistic free
+   time: a third of what is left before 22:00, in 5-minute steps, 20-120. The suggestion is stored next to the
+   confirmed number so personalization can learn how far apart they are.
+2. **Confirm the time.** One tap. Even 20 minutes is a day.
+3. **The one essential thing.** One goal, stored as `focus_goal_id`; it leads the Today line.
+4. **Minutes per goal.** Defaults: the essential goal gets half, the rest share by priority; the user adjusts in
+   5-minute steps; zero lets a goal rest. Stored as `allocations`. The interview-prep hour belongs to a Craft or
+   Career goal and takes that goal's minutes; a user with no such goal never sees the hour.
+5. **The encouraging summary.** Deterministic, under 20 words, never guilt: "20 minutes is a real day. Gym first,
+   then Contains Duplicate. That is 1% better." Shown while the plan is made and kept under the Today line.
+Goal areas are domain-neutral: Career, Craft, Body, Mind, Money, People, Projects, Other.
 
 ### 4.7 Goals and the daily plan (phase 9)
 Goal: the day starts with a question, not a dashboard, and the plan bends to the answer.
