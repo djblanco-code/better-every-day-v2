@@ -1,4 +1,4 @@
-# Status after Phase 6 (2026-10-22)
+# Status after Phase 7 (2026-10-22)
 
 Everything in Phases 0-3 that does not need the owner's accounts is built, merged and live (31 PRs, CI green on each).
 
@@ -12,6 +12,10 @@ verify locally (no Auth round trip per page), the Jobs pages load in one RPC, a 
 awake, Speed Insights records real-user Core Web Vitals, and CI proves row isolation on every PR against a throwaway
 local Supabase.
 
+Phase 7 (docs/JOBS-UX.md): the Job Tracker is a next-action list. Insights lands you on the numbers that matter
+(response rate, interview rate, days to first reply, weekly volume); Pipeline holds what needs you and what went
+quiet; Mail reads Gmail (app password in the Vault) and proposes stage changes you confirm.
+
 Phase 6: a fourth module, Life (habits, check-in, money), and Today rebuilt as "your day": check in, what needs you
 today from Jobs and Network, the Recall plan sized to the time you have (slots past it wait as "if time allows"),
 today's habits, and a glance at readiness and money. PRD §4.6.
@@ -22,7 +26,7 @@ Live: https://better-every-day-v2-neon.vercel.app (GitHub sign-in; invite code r
 |---|---|
 | Home | `/` journal (also parses expenses, health and existing habits into Life) (type or dictate; sorted into Recall reps, people, events once the key is set) + launcher with live counts |
 | Recall | `/today`, `/practice`, `/practice/<track>/<id>`, `/history/<id>`, `/program`, `/settings` |
-| Jobs | `/jobs` Pipeline (needs you, gone quiet, stage chips + table, next action per application), `/jobs/board` Kanban, `/jobs/todo` Leads, `/jobs/mail` Gmail suggestions, `/jobs/insights` charts |
+| Jobs | `/jobs` Insights (headline numbers, weekly applications, how far they got, where things stand, by sender), `/jobs/pipeline` (needs you, gone quiet with Nudge / No reply, stage chips + table, next action per application), `/jobs/board` Kanban, `/jobs/todo` Leads, `/jobs/mail` Gmail suggestions |
 | Network | `/network` people, events, follow-ups |
 | Life | `/life` habits (14-day grid), daily check-in (sleep, energy, mood, exercise, weight), money (spent vs limits by category) |
 
