@@ -52,3 +52,5 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [ ] 4.6 zod-validate every server-action input; per-user rate limit on model-calling actions.
 - [ ] 4.7 Lighthouse in CI (`@lhci/cli`) with budgets; anything under 90 on mobile gets fixed.
 - [ ] 4.8 Dialog focus trap + `aria-live` status messages; axe-core smoke test on the main pages.
+- [x] 4.1 Observability: documented in docs/OPERATIONS.md (Vercel + Supabase alerts to turn on, rollback, weekly cost view). Owner turns the notifications on.
+- [x] 4.2 Backups: weekly `pg_dump` command + restore drill in docs/OPERATIONS.md.
