@@ -42,10 +42,11 @@ export interface TodayData { plan: PlanView; summary: Summary; today: string; da
 /** Everything on Today that is not the Recall plan. One parallel fetch; each table is RLS-scoped. */
 async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras> {
   const today = c.today, soon = (() => { const d = new Date(today + "T12:00"); d.setDate(d.getDate() + 3); return d.toISOString().slice(0, 10); })();
-  const [ck, hb, hl, as, ac, pp, tx, bg] = await Promise.all([
+  const [ck, hb, hl, na, as, ac, pp, tx, bg] = await Promise.all([
     c.supabase.from("checkins").select("date,sleep_hours,energy,mood,exercise_minutes,weight,time_available,note").eq("date", today).maybeSingle(),
     c.supabase.from("habits").select("id,name,icon,cadence,target_per_week,active,sort").eq("active", true).order("sort"),
     c.supabase.from("habit_logs").select("habit_id,done").eq("date", today),
+    c.supabase.from("applications").select("id,company,role,next_action,next_action_on,stage").eq("kind", "applied").not("next_action_on", "is", null).lte("next_action_on", soon),
     c.supabase.from("assessments").select("id,company,role,platform,due,status").in("status", ["todo", "expired"]),
     c.supabase.from("actions").select("id,company,text,due,done").eq("done", false),
     c.supabase.from("people").select("id,name,company,follow_up,follow_up_done").eq("follow_up_done", false).neq("follow_up", ""),
@@ -55,6 +56,9 @@ async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras>
   const doneIds = new Set(((hl.data ?? []) as { habit_id: string; done: boolean }[]).filter((l) => l.done).map((l) => l.habit_id));
   const habits = ((hb.data ?? []) as Habit[]).filter((h) => dueToday(h, today)).map((habit) => ({ habit, done: doneIds.has(habit.id) }));
   const due: DueItem[] = [];
+  for (const a of (na.data ?? []) as { id: string; company: string; role: string; next_action: string; next_action_on: string; stage: string }[]) {
+    if (["applied", "intro_call", "interview", "final"].includes(a.stage)) due.push({ kind: "call", id: "na-" + a.id, title: `${a.company}: ${a.next_action || "next step"}`, detail: a.role, due: a.next_action_on, overdue: a.next_action_on < today, href: "/jobs" });
+  }
   for (const a of (as.data ?? []) as { id: string; company: string; role: string; platform: string; due: string | null }[]) {
     if (!a.due || a.due <= soon) due.push({ kind: "assessment", id: a.id, title: `${a.company} assessment`, detail: [a.platform, a.role].filter(Boolean).join(" · "), due: a.due, overdue: !!a.due && a.due < today, href: "/jobs/action" });
   }

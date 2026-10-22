@@ -22,7 +22,7 @@ Live: https://better-every-day-v2-neon.vercel.app (GitHub sign-in; invite code r
 |---|---|
 | Home | `/` journal (also parses expenses, health and existing habits into Life) (type or dictate; sorted into Recall reps, people, events once the key is set) + launcher with live counts |
 | Recall | `/today`, `/practice`, `/practice/<track>/<id>`, `/history/<id>`, `/program`, `/settings` |
-| Jobs | `/jobs` (overview, funnel, search windows), `/jobs/board` (Kanban, drag = stage change), `/jobs/all`, `/jobs/action`, `/jobs/todo` (apply-yourself + add by link) |
+| Jobs | `/jobs` Pipeline (needs you, gone quiet, stage chips + table, next action per application), `/jobs/board` Kanban, `/jobs/todo` Leads, `/jobs/mail` Gmail suggestions, `/jobs/insights` charts |
 | Network | `/network` people, events, follow-ups |
 | Life | `/life` habits (14-day grid), daily check-in (sleep, energy, mood, exercise, weight), money (spent vs limits by category) |
 
