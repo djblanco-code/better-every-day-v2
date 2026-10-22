@@ -8,7 +8,7 @@ import { btn, btnGhost, Card, Shell } from "./jobs/ui";
 const localDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
 type SR = { continuous: boolean; interimResults: boolean; lang: string; onresult: ((e: { resultIndex: number; results: ArrayLike<{ isFinal: boolean; 0: { transcript: string } }> }) => void) | null; onerror: ((e: { error: string }) => void) | null; onend: (() => void) | null; start: () => void; stop: () => void };
 
-export function HomeClient({ email, counts }: { email: string; counts: { apps: number; need: number; interviewing: number; streak: number; minutes: number; readiness: number; people: number; events: number; follow_ups: number } }) {
+export function HomeClient({ email, counts }: { email: string; counts: { apps: number; need: number; interviewing: number; streak: number; minutes: number; readiness: number; people: number; events: number; follow_ups: number; habits_done: number; habits_total: number; spent_cents: number } }) {
   const [J, setJ] = useState<{ entries: Entry[]; has_key: boolean } | null>(null);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -46,6 +46,7 @@ export function HomeClient({ email, counts }: { email: string; counts: { apps: n
       <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-1 lg:content-start">
         {tile("/jobs", "Job Tracker", "Applications, follow-ups, assessments to do, calls to book.", [["applied", counts.apps], ["need you", counts.need, counts.need > 0], ["in interviews", counts.interviewing]], "Open Job Tracker")}
         {tile("/today", "Recall", "One hour a day for six months: LeetCode, Python, System Design, DSA and debugging, graded and scheduled.", [["day streak", counts.streak, counts.streak > 0], ["minutes today", counts.minutes, counts.minutes >= 60], ["readiness", `${counts.readiness}%`]], "Open Recall")}
+        {tile("/life", "Life", "Habits, how you slept and felt, and what you spent this month.", [["habits today", `${counts.habits_done}/${counts.habits_total}`], ["spent this month", `$${Math.round(counts.spent_cents / 100)}`]])}
         {tile("/network", "Network", "People you met, mentors, events, and who can connect you to what.", [["people", counts.people], ["events", counts.events], ["follow-ups", counts.follow_ups, counts.follow_ups > 0]], "Open Network")}
       </div>
       </div>

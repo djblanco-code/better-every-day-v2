@@ -1,5 +1,5 @@
 // Pure routing rules for auth, kept out of middleware so they can be unit-tested.
-export const PROTECTED_PREFIXES = ["/today", "/practice", "/program", "/history", "/settings", "/jobs", "/network", "/chat"];
+export const PROTECTED_PREFIXES = ["/today", "/practice", "/program", "/history", "/settings", "/jobs", "/network", "/life", "/chat"];
 export const SIGN_IN_PATH = "/sign-in";
 export const INVITE_PATH = "/invite";
 export const HOME_AFTER_SIGN_IN = "/today";
