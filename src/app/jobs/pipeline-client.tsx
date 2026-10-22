@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { completeNextAction, getJobs, nudge, saveAction, saveAssessment, startSearch, updateApplication } from "./actions";
+import { completeNextAction, getJobs, markNoReply, nudge, saveAction, saveAssessment, startSearch, updateApplication } from "./actions";
 import { ACTIVE, OPEN, STAGES, STAGE_LABEL, isStale, type Application, type JobsState, type Stage } from "@/lib/jobs/types";
 import { AppDialog } from "./app-dialog";
 import { btn, btnGhost, Card, field, JobsNav, localDate, Shell, StagePill } from "./ui";
@@ -76,7 +76,10 @@ export function PipelineClient() {
               <button className={btnGhost} disabled={busy === a.id} onClick={() => run(a.id, nudge(a.id, localDate()))}>Nudge</button>
               <button className="text-sm text-neutral-500 hover:underline" disabled={busy === a.id} onClick={() => run(a.id, updateApplication(a.id, { stage: "ghosted" }, localDate()))}>No reply</button>
             </li>))}</ul>
-          {stale.length > 25 ? <p className="mt-2 text-xs text-neutral-500">{stale.length - 25} more below in the table.</p> : null}
+          <div className="mt-3 flex flex-wrap items-center gap-3">
+            {stale.length > 25 ? <span className="text-xs text-neutral-500">Showing 25 of {stale.length}; the rest are in the table.</span> : null}
+            <button className={btnGhost} disabled={busy === "bulk"} onClick={() => { if (confirm(`Mark all ${stale.length} as No reply? They stay in the record under that stage.`)) run("bulk", markNoReply(stale.map((a) => a.id))); }}>Mark all {stale.length} as No reply</button>
+          </div>
         </Card>
       ) : null}
 

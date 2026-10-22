@@ -132,3 +132,13 @@ export async function nudge(id: string, clientDate?: string): Promise<{ ok: true
 export async function completeNextAction(id: string, clientDate?: string): Promise<{ ok: true }> {
   return updateApplication(id, { next_action: "", next_action_on: null, last_contact_on: validDate(clientDate) }, clientDate);
 }
+
+/** Bulk close the gone-quiet list as "No reply". One update, no per-row history entry (the stage change is the record). */
+export async function markNoReply(ids: string[]): Promise<{ ok: true; n: number }> {
+  const { supabase } = await ctx();
+  const list = parse(z.array(idS).min(1).max(1000), ids);
+  const { error } = await supabase.from("applications").update({ stage: "ghosted", updated_at: new Date().toISOString() }).in("id", list).eq("stage", "applied");
+  if (error) throw new Error(error.message);
+  bump();
+  return { ok: true, n: list.length };
+}
