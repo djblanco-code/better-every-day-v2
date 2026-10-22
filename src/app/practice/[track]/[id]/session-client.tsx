@@ -91,8 +91,8 @@ export function SessionClient(props: {
           }}
           className="h-10 rounded-lg bg-neutral-900 px-4 font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
         >{grading === "…" ? "Grading…" : "Submit for grading"}</button>
-        {grading && grading !== "…" ? <span className="text-red-700">{grading}</span> : null}
-        <span className="text-neutral-500">{text.length} chars · {saved === "saved" ? "saved" : saved === "saving" ? "saving…" : saved === "error" ? "not saved (offline?)" : "unsaved"}</span>
+        {grading && grading !== "…" ? <span role="alert" className="text-red-700">{grading}</span> : null}
+        <span role="status" aria-live="polite" className="text-neutral-500">{text.length} chars · {saved === "saved" ? "saved" : saved === "saving" ? "saving…" : saved === "error" ? "not saved (offline?)" : "unsaved"}</span>
       </div>
     </main>
   );
