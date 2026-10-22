@@ -1,42 +1,44 @@
 import { publicEnv } from "@/lib/env";
+import { supabaseServer } from "@/lib/supabase/server";
+import { loadBanks } from "@/lib/recall/banks";
+import { loadState } from "@/lib/recall/store";
+import { summary } from "@/lib/recall/plan";
+import { ACTIVE } from "@/lib/jobs/types";
+import { HomeClient } from "./home-client";
 
-// Rendered per request so a missing env var is reported on the page instead of failing the build.
+// Signed out: a short landing with sign-in. Signed in: the launcher (journal + the three apps with live counts).
 export const dynamic = "force-dynamic";
 
-export default function Home() {
-  let host: string | null = null;
-  let problem: string | null = null;
-  try {
-    host = new URL(publicEnv().NEXT_PUBLIC_SUPABASE_URL).host;
-  } catch (e) {
-    problem = e instanceof Error ? e.message : String(e);
+export default async function Home() {
+  let host: string | null = null, problem: string | null = null;
+  try { host = new URL(publicEnv().NEXT_PUBLIC_SUPABASE_URL).host; } catch (e) { problem = e instanceof Error ? e.message : String(e); }
+  const supabase = host ? await supabaseServer() : null;
+  const user = supabase ? (await supabase.auth.getUser()).data.user : null;
+  if (!user || !supabase) {
+    return (
+      <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-4 px-6">
+        <h1 className="text-3xl font-semibold tracking-tight">Better Every Day</h1>
+        <p className="text-neutral-600">One hour a day of interview practice, every application in one place, and the people who can help. Private, invite-only, your own AI key.</p>
+        {host ? <a href="/sign-in" className="inline-flex h-10 w-fit items-center rounded-lg bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-800">Sign in</a> : <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900"><p className="font-medium">Deployed, but not configured yet.</p><p className="mt-1">Add <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> in Vercel, then redeploy.</p><pre className="mt-2 whitespace-pre-wrap text-xs">{problem}</pre></div>}
+      </main>
+    );
   }
+  const today = new Date().toISOString().slice(0, 10);
+  const [{ banks, cur }, st, apps, assess, actions, people, events] = await Promise.all([
+    loadBanks(supabase), loadState(supabase, today),
+    supabase.from("applications").select("stage,kind").eq("kind", "applied"),
+    supabase.from("assessments").select("status").in("status", ["todo", "expired"]),
+    supabase.from("actions").select("done").eq("done", false),
+    supabase.from("people").select("follow_up,follow_up_done"),
+    supabase.from("events").select("id"),
+  ]);
+  const s = summary(st, banks, cur, today);
+  const A = (apps.data ?? []) as { stage: string }[];
+  const P = (people.data ?? []) as { follow_up: string; follow_up_done: boolean }[];
   return (
-    <main className="mx-auto flex min-h-screen max-w-xl flex-col justify-center gap-4 px-6">
-      <p className="text-sm text-neutral-500">Hello</p>
-      <h1 className="text-3xl font-semibold tracking-tight">Better Every Day</h1>
-      {host ? (
-        <>
-          <p className="text-neutral-600">
-            Deployed and configured. Supabase project: <code className="rounded bg-neutral-100 px-1">{host}</code>
-          </p>
-          <a
-            href="/today"
-            className="inline-flex h-10 w-fit items-center rounded-lg bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-800"
-          >
-            Open the app
-          </a>
-        </>
-      ) : (
-        <div className="rounded-lg border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
-          <p className="font-medium">Deployed, but not configured yet.</p>
-          <p className="mt-1">
-            Add <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> in
-            Vercel → Settings → Environment Variables (all environments), then redeploy.
-          </p>
-          <pre className="mt-2 overflow-x-auto whitespace-pre-wrap text-xs text-amber-800">{problem}</pre>
-        </div>
-      )}
-    </main>
+    <HomeClient email={user.email ?? ""} counts={{
+      apps: A.length, need: (assess.data?.length ?? 0) + (actions.data?.length ?? 0), interviewing: A.filter((a) => (ACTIVE as string[]).includes(a.stage)).length,
+      streak: s.streak, minutes: Math.round(s.today_minutes), readiness: s.readiness_overall, people: P.length, events: events.data?.length ?? 0, follow_ups: P.filter((p) => p.follow_up && !p.follow_up_done).length,
+    }} />
   );
 }

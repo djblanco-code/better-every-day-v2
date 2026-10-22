@@ -30,17 +30,17 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [ ] 1.12 Switch over: use v2 Recall for 7 days; log every gap in `docs/GAPS.md`. **Done when:** you no longer open v1's Recall.
 
 ## Phase 2 — Journal, Memory agent, Chat
-- [ ] 2.1 `journal_entries` + voice/text page on Home; parser with schema and dates; items fan out to `external_reps`, `people`, `events`.
+- [x] 2.1 `journal_entries` + voice/text page on Home; parser with schema and dates; items fan out to `external_reps`, `people`, `events`.
 - [ ] 2.2 `memories` table with pgvector; embeddings via the user's provider; importance job (Vercel Cron, nightly).
 - [ ] 2.3 Consolidation job; archive, never delete; review card on Home.
 - [ ] 2.4 Chat page: streaming, tools read-only by default, orchestrator → Memory agent; audit every call.
 - [ ] 2.5 Drag-and-drop memory cards (dnd-kit): Pinned, goals, projects.
 
 ## Phase 3 — Jobs and Network
-- [ ] 3.1 `applications` + Kanban by stage with dnd-kit; import from v1.
-- [ ] 3.2 Add by link with auto-fill; named search windows.
-- [ ] 3.3 Funnel, assessments, intro calls.
-- [ ] 3.4 `people`, `events`, follow-ups; links to applications.
+- [x] 3.1 `applications` + Kanban by stage with dnd-kit; import from v1.
+- [x] 3.2 Add by link with auto-fill; named search windows.
+- [x] 3.3 Funnel, assessments, intro calls.
+- [x] 3.4 `people`, `events`, follow-ups; links to applications.
 - [ ] 3.5 Gmail (MCP) read-only suggestions, approved by click; Jobs and Network agents.
 
 ## Phase 4 — hardening
@@ -48,3 +48,7 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [ ] 4.2 Backups: weekly `pg_dump` to your own storage; restore drill once.
 - [ ] 4.3 Onboard two friends with their own keys; isolation test in CI.
 - [ ] 4.4 LinkedIn sign-in once the developer app is approved.
+- [ ] 4.5 `npm audit fix` and pin; scheduled weekly CI run of gitleaks + audit. (from docs/ASSESSMENT.md)
+- [ ] 4.6 zod-validate every server-action input; per-user rate limit on model-calling actions.
+- [ ] 4.7 Lighthouse in CI (`@lhci/cli`) with budgets; anything under 90 on mobile gets fixed.
+- [ ] 4.8 Dialog focus trap + `aria-live` status messages; axe-core smoke test on the main pages.
