@@ -59,6 +59,7 @@ export function SettingsClient({ initial }: { initial: SettingsView }) {
         <p className="font-medium text-neutral-900">How the key is used</p>
         <p className="mt-1">Grading a practice session and sorting a journal entry each make one model call with your key. Calls stop at the monthly budget and at ten per minute.</p>
       </section>
+      <section className="rounded-2xl border border-neutral-200 bg-white p-5 text-sm text-neutral-600">
         <p className="font-medium text-neutral-900">Your data</p>
         <p className="mt-1"><a className="underline" href="/api/account/export">Download everything</a> as JSON. Account deletion lives here too once the owner enables it on this deployment.</p>
       </section>
