@@ -16,11 +16,11 @@ export function InstallHint() {
       const visits = Number(localStorage.getItem("visits") ?? "0") + 1;
       localStorage.setItem("visits", String(visits));
       if (standalone || !phone || visits < 2 || localStorage.getItem("install.dismissed")) return;
-      setIos(/iphone|ipad|ipod/i.test(navigator.userAgent));
-      setShow(true);
+      // Deferred a tick: the nudge is not part of the first paint, and the React Compiler rule wants no sync setState here.
+      const t = setTimeout(() => { setIos(/iphone|ipad|ipod/i.test(navigator.userAgent)); setShow(true); }, 0);
       const on = (e: Event) => { e.preventDefault(); setBip(e as BIP); };
       window.addEventListener("beforeinstallprompt", on);
-      return () => window.removeEventListener("beforeinstallprompt", on);
+      return () => { clearTimeout(t); window.removeEventListener("beforeinstallprompt", on); };
     } catch { /* private mode: no hint */ }
   }, []);
   if (!show) return null;
