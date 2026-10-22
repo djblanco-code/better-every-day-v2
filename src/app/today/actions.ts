@@ -89,8 +89,8 @@ async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras>
 
 /** The daily plan ritual: time, the goal that gets today, energy. Once per planning day; the answers also land on
  *  today's check-in so the hour is sized the same way everywhere. */
-export async function makeDayPlan(input: { time_available: number; focus_goal_id: string | null; energy: number | null; sleep_hours?: number | null }, clientDate?: string): Promise<TodayData> {
-  const r = parse(z.object({ time_available: z.number().int().min(0).max(600), focus_goal_id: idS.nullable(), energy: z.number().int().min(1).max(5).nullable(), sleep_hours: z.number().min(0).max(24).nullable().optional() }), input);
+export async function makeDayPlan(input: { time_available: number; focus_goal_id: string | null; energy: number | null; sleep_hours?: number | null; mood?: number | null; exercise_minutes?: number | null }, clientDate?: string): Promise<TodayData> {
+  const r = parse(z.object({ time_available: z.number().int().min(0).max(600), focus_goal_id: idS.nullable(), energy: z.number().int().min(1).max(5).nullable(), sleep_hours: z.number().min(0).max(24).nullable().optional(), mood: z.number().int().min(1).max(5).nullable().optional(), exercise_minutes: z.number().int().min(0).max(600).nullable().optional() }), input);
   const c = await ctx(clientDate);
   const day = planningDay();
   const { error } = await c.supabase.from("day_plans").upsert({ user_id: c.user.id, day, time_available: r.time_available, energy: r.energy, focus_goal_id: r.focus_goal_id, note: "" });
@@ -99,6 +99,8 @@ export async function makeDayPlan(input: { time_available: number; focus_goal_id
   const patch: Record<string, unknown> = { time_available: r.time_available };
   if (r.energy != null) patch.energy = r.energy;
   if (r.sleep_hours != null) patch.sleep_hours = r.sleep_hours;
+  if (r.mood != null) patch.mood = r.mood;
+  if (r.exercise_minutes != null) patch.exercise_minutes = r.exercise_minutes;
   await c.supabase.from("checkins").upsert({ ...(cur ?? {}), ...patch, user_id: c.user.id, date: c.today, updated_at: new Date().toISOString() });
   revalidatePath("/"); revalidatePath("/life");
   const plan = c.st.plans[c.today] ?? buildPlan(c.st, c.banks, c.cur, c.today);

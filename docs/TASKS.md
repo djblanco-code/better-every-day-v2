@@ -89,5 +89,5 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 ## Phase 9 — goals and the daily plan (PRD §4.7)
 - [x] 9.1 Schema: goals, goal_profile, day_plans (migration 0012, RLS, applied live).
 - [x] 9.2 Goals questionnaire (`/goals`): seven questions, WOOP shape, editable; the list it produces.
-- [x] 9.3 Daily plan ritual on Home: time, goal for today, energy; once per planning day (06:00 New York); one line with Change afterwards; writes time and energy to the check-in so the hour sizes the same everywhere.
+- [x] 9.3 Daily plan ritual on Home: the questionnaire owns the page (time, goal for today, energy, then the check-in: sleep, mood, exercise), "Making today's plan…" for a beat, then the plan; one line with Change afterwards; the separate check-in card is gone from Home (it lives in Life).
 - [ ] 9.4 Lead the page with the focus goal's items (job → Pipeline due items; network → follow-ups; health → habits) and show the if-then plan on low-energy days.

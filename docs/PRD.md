@@ -107,8 +107,9 @@ Goal: the day starts with a question, not a dashboard, and the plan bends to the
   (wish → what done looks like per area → obstacle → if-then plan) plus two constraints (hours a week, best time
   and days off). Up to three areas, one goal each. Research: implementation intentions raise goal attainment
   (d ≈ .61, Gollwitzer & Sheeran 2006); onboarding questionnaires should stay under ten mixed questions.
-- G2. **Daily plan ritual**: Home asks "Let's make your daily plan": how much time today, which goal gets today,
-  how much energy. Three taps. Asked once per planning day and then shown as one line with "Change".
+- G2. **Daily plan ritual**: Home asks "Let's make your daily plan" and shows nothing else until it is done: how
+  much time today, which goal gets today, how much energy, then the check-in (sleep, mood, exercise). Then a short
+  "Making today's plan…" beat and the plan. Asked once per planning day and then shown as one line with "Change".
 - G3. **Planning day** rolls over at 06:00 America/New_York, so a 1 a.m. session still belongs to the day before.
 - G4. **The plan bends**: time trims the hour (slots past it wait as "if time allows"); the focus goal is what
   the page leads with; energy 1-2 shortens the hour to 40 minutes with the review first. The engine's plan is
