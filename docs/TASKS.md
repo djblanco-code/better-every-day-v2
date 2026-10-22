@@ -44,8 +44,8 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [ ] 3.5 Gmail (MCP) read-only suggestions, approved by click; Jobs and Network agents.
 
 ## Phase 4 — hardening
-- [ ] 4.1 Observability: Vercel + Supabase alerts on error rate and latency; weekly cost report per user.
-- [ ] 4.2 Backups: weekly `pg_dump` to your own storage; restore drill once.
+- [x] 4.1 Observability: Vercel + Supabase alerts on error rate and latency; weekly cost report per user. (docs/OPERATIONS.md; the owner turns the notifications on)
+- [x] 4.2 Backups: weekly `pg_dump` to your own storage; restore drill once. (command + drill in docs/OPERATIONS.md)
 - [ ] 4.3 Onboard two friends with their own keys; isolation test in CI.
 - [ ] 4.4 LinkedIn sign-in once the developer app is approved.
 - [x] 4.5 `npm audit fix` and pin; scheduled weekly CI run of gitleaks + audit. (from docs/ASSESSMENT.md)
