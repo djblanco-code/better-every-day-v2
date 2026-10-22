@@ -69,5 +69,5 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 ## Phase 6 — Life, and a Today that fits the day (PRD §4.6)
 - [x] 6.1 Schema: habits, habit_logs, checkins, transactions, budgets (migration 0010, RLS, applied live).
 - [x] 6.2 Life page (`/life`): habits grid + today's taps, check-in, money month view with limits; Life in the nav and on Home.
-- [ ] 6.3 Today = your day: check-in, needs-you-today, plan trimmed to time available, habits row, glance panel.
-- [ ] 6.4 Journal parses expenses, health and existing habits into Life (parser v3).
+- [x] 6.3 Today = your day: check-in, needs-you-today, plan trimmed to time available, habits row, glance panel.
+- [x] 6.4 Journal parses expenses, health and existing habits into Life (parser v3).
