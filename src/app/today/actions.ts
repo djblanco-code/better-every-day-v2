@@ -57,7 +57,11 @@ async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras>
   const habits = ((hb.data ?? []) as Habit[]).filter((h) => dueToday(h, today)).map((habit) => ({ habit, done: doneIds.has(habit.id) }));
   const due: DueItem[] = [];
   for (const a of (na.data ?? []) as { id: string; company: string; role: string; next_action: string; next_action_on: string; stage: string }[]) {
+<<<<<<< HEAD
     if (["applied", "intro_call", "interview", "final"].includes(a.stage)) due.push({ kind: "call", id: "na-" + a.id, title: `${a.company}: ${a.next_action || "next step"}`, detail: a.role, due: a.next_action_on, overdue: a.next_action_on < today, href: "/jobs/pipeline" });
+=======
+    if (["applied", "intro_call", "interview", "final"].includes(a.stage)) due.push({ kind: "call", id: "na-" + a.id, title: `${a.company}: ${a.next_action || "next step"}`, detail: a.role, due: a.next_action_on, overdue: a.next_action_on < today, href: "/jobs" });
+>>>>>>> origin/main
   }
   for (const a of (as.data ?? []) as { id: string; company: string; role: string; platform: string; due: string | null }[]) {
     if (!a.due || a.due <= soon) due.push({ kind: "assessment", id: a.id, title: `${a.company} assessment`, detail: [a.platform, a.role].filter(Boolean).join(" · "), due: a.due, overdue: !!a.due && a.due < today, href: "/jobs/action" });
