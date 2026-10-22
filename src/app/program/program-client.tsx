@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { Shell } from "../shell";
 import { useEffect, useState, useTransition } from "react";
 import { getProgram, type ProgramData } from "./actions";
@@ -28,7 +29,7 @@ export function ProgramClient() {
   return (
     <Shell>
       <div className="flex flex-wrap items-end justify-between gap-3">
-        <div><a href="/today" className="text-sm text-neutral-600 hover:underline">← Today</a><h1 className="text-3xl font-semibold tracking-tight">Program</h1>
+        <div><Link href="/" className="text-sm text-neutral-600 hover:underline">← Home</Link><h1 className="text-3xl font-semibold tracking-tight">Program</h1>
           <p className="text-sm text-neutral-500">Week {P.week} of {P.of} · {P.phase === "speed" ? "speed phase" : "learning phase"} · started {P.start ?? "today"}{P.end ? ` · ends ${P.end}` : ""} · {P.daily_minutes} min a day</p></div>
         <a href="/settings" className="text-sm text-neutral-600 hover:underline">Settings</a>
       </div>

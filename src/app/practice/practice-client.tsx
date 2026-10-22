@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { Shell } from "../shell";
 import { useEffect, useMemo, useState } from "react";
 import { getPractice, type PracticeData } from "./actions";
@@ -32,7 +33,7 @@ export function PracticeClient({ initialTrack }: { initialTrack: string }) {
 
   return (
     <Shell>
-      <div><a href="/today" className="text-sm text-neutral-600 hover:underline">← Today</a><h1 className="text-3xl font-semibold tracking-tight">Practice</h1></div>
+      <div><Link href="/" className="text-sm text-neutral-600 hover:underline">← Home</Link><h1 className="text-3xl font-semibold tracking-tight">Practice</h1></div>
       <div className="flex flex-wrap gap-1 rounded-xl bg-neutral-200/60 p-1 self-start">{TRACKS.map((t) => <button key={t} onClick={() => { setTrack(t); setF({ ...f, c: "", list: "", co: "" }); }} className={`rounded-lg px-3 py-1.5 text-sm ${t === track ? "bg-white shadow-sm" : "text-neutral-600"}`}>{TRACK_NAME[t]}</button>)}</div>
       {!D ? <p className="text-neutral-500">Loading…</p> : (
         <>

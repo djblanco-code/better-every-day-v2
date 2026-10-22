@@ -6,7 +6,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Better Every Day",
     short_name: "Better",
     description: "One hour a day: interview practice, applications, and the people who can help.",
-    start_url: "/today",
+    start_url: "/",
     display: "standalone",
     background_color: "#ffffff",
     theme_color: "#1d4ed8",

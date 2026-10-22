@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { Shell } from "../shell";
 import { useState, useTransition } from "react";
 import { clearKey, saveSettings, testKey, type SettingsView } from "./actions";
@@ -25,7 +26,7 @@ export function SettingsClient({ initial }: { initial: SettingsView }) {
   return (
     <Shell gap="gap-5">
       <div className="flex items-end justify-between gap-3">
-        <div><a href="/today" className="text-sm text-neutral-600 hover:underline">← Today</a><h1 className="text-3xl font-semibold tracking-tight">Settings</h1></div>
+        <div><Link href="/" className="text-sm text-neutral-600 hover:underline">← Home</Link><h1 className="text-3xl font-semibold tracking-tight">Settings</h1></div>
         <span className="text-sm text-neutral-500">{s.email}</span>
       </div>
 

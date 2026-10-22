@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { Shell } from "../../../shell";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -46,7 +47,7 @@ export function SessionClient(props: {
   return (
     <Shell width="wide">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <a href="/today" className="text-sm text-neutral-600 hover:underline">← Today</a>
+        <Link href="/" className="text-sm text-neutral-600 hover:underline">← Home</Link>
         <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2">
           <span className={`min-w-[5ch] text-2xl font-semibold tabular-nums ${clockColor}`}>{startedAt == null ? `${String(mins).padStart(2, "0")}:00` : clock}</span>
           {startedAt == null ? (
