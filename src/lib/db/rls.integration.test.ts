@@ -57,7 +57,7 @@ describe.skipIf(!enabled)("RLS on public.users", () => {
   it("a data table (applications) and the jobs RPC are isolated the same way", async () => {
     // Service role bypasses RLS: plant one application for A.
     const row = { user_id: ids[0], id: `app-${stamp}`, company: "Acme", role: "SWE", applied_on: "2026-01-01", stage: "applied", kind: "applied" };
-    const { error: ins } = await admin.from("applications").insert(row);
+    const { error: ins } = await admin.from("applications").insert(row as never);
     expect(ins).toBeNull();
     const asB = createClient(url!, anon!, { auth: { persistSession: false } });
     await asB.auth.signInWithPassword(b);
