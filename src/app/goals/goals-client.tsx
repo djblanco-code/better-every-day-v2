@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { Shell } from "../shell";
 import { btn, btnGhost, Card, field } from "../jobs/ui";
 import { getGoals, removeGoal, saveQuestionnaire, type GoalsState } from "./actions";
@@ -12,6 +13,7 @@ type Draft = { wish: string; areas: Area[]; titles: Partial<Record<Area, string>
 const empty: Draft = { wish: "", areas: [], titles: {}, obstacle: "", if_then: "", hours_per_week: 7, best_time: "morning", days_off: [] };
 
 export function GoalsClient() {
+  const router = useRouter();
   const [G, setG] = useState<GoalsState | null>(null);
   const [editing, setEditing] = useState(false);
   const [step, setStep] = useState(0);
@@ -31,7 +33,8 @@ export function GoalsClient() {
     setMsg(null);
     try {
       await saveQuestionnaire({ profile: { wish: d.wish, obstacle: d.obstacle, if_then: d.if_then, hours_per_week: d.hours_per_week, best_time: d.best_time, days_off: d.days_off }, goals: d.areas.map((a) => ({ id: G.goals.find((g) => g.area === a)?.id, area: a, title: (d.titles[a] ?? "").trim() || areaLabel(a) })) });
-      setEditing(false); setStep(0); load();
+      // Saved: back to Home, where the daily plan can now ask which goal gets today.
+      router.push("/");
     } catch (e) { setMsg(String((e as Error)?.message ?? e)); }
   };
 
