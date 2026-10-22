@@ -24,7 +24,7 @@ function validDate(d: string | undefined): string {
 async function ctx(today?: string) {
   const supabase = await supabaseServer();
   const data = await sessionUser(supabase);
-  if (!data.user) throw new Error("signed out");
+  if (!data.user) throw new Error("You're signed out. Sign in again.");
   const d = validDate(today);
   const [{ banks, cur }, st] = await Promise.all([loadBanks(supabase), loadState(supabase, d)]);
   return { supabase, user: data.user, today: d, banks, cur, st };

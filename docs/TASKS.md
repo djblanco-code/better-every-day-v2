@@ -78,3 +78,9 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 7.2 Mail: Gmail app password in the Vault (Settings), IMAP check of the last 14 days, rule-based classification, suggestions you confirm (`/jobs/mail`).
 - [x] 7.3 Insights is the landing page again (owner's call), rebuilt with the dataviz method: stat tiles, weekly bars, sorted horizontal bars for reach and stage, by-sender table, table view toggle; metrics module with tests.
 - [ ] 7.4 Daily mail check from the cron once the owner has set it up and the first manual checks look right.
+
+## Phase 8 — soul (docs/SOUL.md)
+- [x] 8.1 Type and tokens: Fraunces for titles and the hero number, Inter for the body (it was Arial), warm paper neutrals, one accent for the next thing to do, a designed dark set, focus rings, cards that rise once.
+- [x] 8.2 Home is three things: check-in, the hour, the journal; one line for everything else. Day zero is one card with one button. Mornings open the check-in; evenings lead with the journal; a finished hour folds into one line.
+- [x] 8.3 Insights keeps three numbers. Error copy sounds like a person.
+- [ ] 8.4 Keyboard: Return submits every form; a shortcut for Start on the first slot.

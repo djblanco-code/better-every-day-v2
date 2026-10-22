@@ -48,7 +48,7 @@ export function PracticeClient({ initialTrack }: { initialTrack: string }) {
             <label className="ml-auto flex items-center gap-2 text-sm text-neutral-600"><input type="checkbox" checked={f.due} onChange={(e) => setF({ ...f, due: e.target.checked })} />Due and new only</label>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {next ? <a href={href(next.id)} className="inline-flex h-9 items-center rounded-lg bg-neutral-900 px-3 text-sm font-medium text-white hover:bg-neutral-800">Start next: {next.title}</a> : null}
+            {next ? <a href={href(next.id)} className="inline-flex h-9 items-center rounded-lg bg-accent px-3 text-sm font-medium text-accent-ink hover:brightness-110">Start next: {next.title}</a> : null}
             {L.length ? <button type="button" onClick={() => { window.location.href = href(L[Math.floor(Math.random() * L.length)].id); }} className="inline-flex h-9 items-center rounded-lg border border-neutral-300 bg-white px-3 text-sm hover:bg-neutral-50">Random</button> : null}
             <span className="text-sm text-neutral-500">{L.length} of {D.items.length}</span>
           </div>

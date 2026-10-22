@@ -29,7 +29,7 @@ export function planView(plan: Plan, st: RecallState, cur: Curriculum, today: st
   };
 }
 
-export interface Summary { streak: number; due: number; readiness: Record<Track, number>; readiness_overall: number; today_minutes: number; target: number }
+export interface Summary { streak: number; due: number; readiness: Record<Track, number>; readiness_overall: number; today_minutes: number; target: number; sessions_total: number }
 const WEIGHTS: Record<Track, number> = { leetcode: 0.4, python: 0.15, system_design: 0.2, dsa: 0.15, debugging: 0.1 };
 
 export function summary(st: RecallState, banks: Banks, cur: Curriculum, today: string): Summary {
@@ -41,5 +41,5 @@ export function summary(st: RecallState, banks: Banks, cur: Curriculum, today: s
   const due = Object.values(st.items).filter((v) => v.next_due && v.next_due <= today).length;
   const rd = Object.fromEntries(TRACKS.map((t) => [t, readiness(st, banks, t)])) as Record<Track, number>;
   const overall = Math.round(TRACKS.reduce((a, t) => a + rd[t] * WEIGHTS[t], 0));
-  return { streak, due, readiness: rd, readiness_overall: overall, today_minutes: minutesOn(st, today), target: cur.daily_minutes ?? 60 };
+  return { streak, due, readiness: rd, readiness_overall: overall, today_minutes: minutesOn(st, today), target: cur.daily_minutes ?? 60, sessions_total: st.sessions.length + (st.external ?? []).length };
 }

@@ -35,7 +35,7 @@ export function InsightsClient() {
       <style>{`.viz{--viz-ink:#2a78d6;--viz-grid:#e5e7eb;--viz-muted:#9ca3af}@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .viz{--viz-ink:#3987e5;--viz-grid:#3a3a3a;--viz-muted:#8b8b8b}}`}</style>
       <JobsNav active="insights" />
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-neutral-500">{sv ? `${sv.name} · ${sv.end ? `${sv.start} to ${sv.end} (finished)` : `since ${sv.start}`}` : "All time"}</p>
+        <p className="text-sm text-neutral-500">{sv ? `${sv.name} · ${sv.end ? `${sv.start} to ${sv.end} (finished)` : `since ${sv.start}`}` : "All time"} · {H.total} applications, {H.open} open</p>
         <div className="flex flex-wrap items-center gap-2">
           <select className={field} aria-label="Search window" value={S.viewing} onChange={(e) => { localStorage.setItem(sidKey, e.target.value); load(); }}>{S.searches.map((s) => <option key={s.id} value={s.id}>{s.name}{s.end ? "" : " (current)"}</option>)}<option value="all">All time</option></select>
           {newSearch === null ? <button className={btnGhost} onClick={() => setNewSearch(`Job search ${S.searches.length + 1}`)}>New search</button> : (
@@ -51,13 +51,11 @@ export function InsightsClient() {
 
       {needs ? <Link href="/jobs/pipeline" className="block rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900 hover:bg-amber-100">{needs} thing{needs === 1 ? "" : "s"} need you · open the Pipeline →</Link> : null}
 
-      {/* KPI row */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-5">
-        <Tile label="Applications" value={String(H.total)} sub={`${H.open} still open`} />
+      {/* Three numbers that change what you do next. The rest lives in subtitles. */}
+      <div className="grid grid-cols-3 gap-3">
         <Tile label="Last 7 days" value={String(H.last7)} sub={`${delta >= 0 ? "+" : ""}${delta} vs the 7 before`} tone={delta > 0 ? "up" : delta < 0 ? "down" : undefined} />
-        <Tile label="Response rate" value={`${H.responseRate}%`} sub={`${H.responded} replied (any answer)`} />
-        <Tile label="Interview rate" value={`${H.interviewRate}%`} sub="reached an interview" />
-        <Tile label="Days to first reply" value={H.medianDays == null ? "–" : String(H.medianDays)} sub="median, when they replied" />
+        <Tile label="Response rate" value={`${H.responseRate}%`} sub={`${H.responded} of ${H.total} replied`} />
+        <Tile label="Interview rate" value={`${H.interviewRate}%`} sub={H.medianDays == null ? "no replies yet" : `replies take ${H.medianDays} day${H.medianDays === 1 ? "" : "s"}, median`} />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-5">
@@ -84,7 +82,7 @@ export function InsightsClient() {
 }
 
 function Tile({ label, value, sub, tone }: { label: string; value: string; sub: string; tone?: "up" | "down" }) {
-  return <div className="rounded-2xl border border-neutral-200 bg-white p-4"><p className="text-xs text-neutral-500">{label}</p><p className="mt-1 text-2xl font-semibold tabular-nums">{value}</p><p className={`mt-0.5 text-xs ${tone === "up" ? "text-green-700" : tone === "down" ? "text-red-700" : "text-neutral-500"}`}>{sub}</p></div>;
+  return <div className="rounded-2xl border border-neutral-200 bg-white p-4"><p className="text-xs text-neutral-500">{label}</p><p className="display mt-1 text-3xl tabular-nums">{value}</p><p className={`mt-0.5 text-xs ${tone === "up" ? "text-green-700" : tone === "down" ? "text-red-700" : "text-neutral-500"}`}>{sub}</p></div>;
 }
 
 function DataTable({ head, rows }: { head: string[]; rows: string[][] }) {

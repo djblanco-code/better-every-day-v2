@@ -14,7 +14,7 @@ export async function getPractice(track: string): Promise<PracticeData> {
   if (!(TRACKS as string[]).includes(track)) throw new Error("bad track");
   const supabase = await supabaseServer();
   const data = await sessionUser(supabase);
-  if (!data.user) throw new Error("signed out");
+  if (!data.user) throw new Error("You're signed out. Sign in again.");
   const [{ banks }, { data: rows }] = await Promise.all([loadBanks(supabase), supabase.from("progress").select("item_id,attempts,best,last,last_date,interval,next_due").eq("track", track)]);
   const progress: Record<string, Progress> = {};
   for (const r of rows ?? []) progress[r.item_id] = { attempts: r.attempts, best: r.best, last: r.last ?? undefined, last_date: r.last_date ?? undefined, interval: r.interval, next_due: r.next_due ?? undefined };

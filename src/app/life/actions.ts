@@ -20,7 +20,7 @@ export interface LifeState {
 async function ctx() {
   const supabase = await supabaseServer();
   const data = await sessionUser(supabase);
-  if (!data.user) throw new Error("signed out");
+  if (!data.user) throw new Error("You're signed out. Sign in again.");
   return { supabase, uid: data.user.id };
 }
 const bump = () => { revalidatePath("/life"); revalidatePath("/today"); revalidatePath("/"); };

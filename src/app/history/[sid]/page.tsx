@@ -55,7 +55,7 @@ export default async function Result({ params }: { params: Promise<{ sid: string
       <details className="rounded-2xl border border-neutral-200 bg-white"><summary className="cursor-pointer px-5 py-3 text-sm font-medium text-neutral-600">What you wrote</summary><pre className="whitespace-pre-wrap border-t border-neutral-200 px-5 py-4 font-mono text-[13px] leading-6">{s.answer}</pre></details>
       <div className="flex flex-wrap gap-2">
         <a href={`/practice/${track}/${encodeURIComponent(s.item_id)}`} className="inline-flex h-10 items-center rounded-lg border border-neutral-300 px-4 text-sm hover:bg-neutral-50">Try it again</a>
-        <Link href="/" className="inline-flex h-10 items-center rounded-lg bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-800">Back to Today</Link>
+        <Link href="/" className="inline-flex h-10 items-center rounded-lg bg-accent px-4 text-sm font-medium text-accent-ink hover:brightness-110">Back to Today</Link>
       </div>
     </Shell>
   );

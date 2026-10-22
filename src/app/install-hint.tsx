@@ -28,7 +28,7 @@ export function InstallHint() {
   return (
     <div role="note" className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-3 text-sm">
       <span className="flex-1">{ios ? "Add this to your Home Screen: tap Share, then “Add to Home Screen”." : "Install this as an app for a full-screen, faster experience."}</span>
-      {bip ? <button className="rounded-lg bg-neutral-900 px-3 py-1.5 text-white" onClick={() => bip.prompt().finally(dismiss)}>Install</button> : null}
+      {bip ? <button className="rounded-lg bg-accent px-3 py-1.5 text-accent-ink" onClick={() => bip.prompt().finally(dismiss)}>Install</button> : null}
       <button aria-label="Dismiss" className="btn-icon px-1 text-neutral-500" onClick={dismiss}>✕</button>
     </div>
   );

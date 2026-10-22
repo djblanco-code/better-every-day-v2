@@ -21,7 +21,7 @@ export async function assess(input: { track: string; id: string; answer: string;
   if (!(TRACKS as string[]).includes(track)) throw new Error("bad track");
   const supabase = await supabaseServer();
   const auth = await sessionUser(supabase);
-  if (!auth.user) throw new Error("signed out");
+  if (!auth.user) throw new Error("You're signed out. Sign in again.");
   const { banks } = await loadBanks(supabase);
   const item = findItem(banks, track, input.id);
   if (!item) throw new Error("Unknown problem");
