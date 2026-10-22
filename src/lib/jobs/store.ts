@@ -4,13 +4,11 @@ import type { Action, Application, Assessment, JobsState, Search } from "./types
 
 // Loads the Jobs state for the signed-in user, scoped to a search window (port of v1 state(sid)).
 export async function loadJobs(supabase: SupabaseClient, userId: string, sid: string | null, today: string): Promise<JobsState> {
-  const [s, a, as, ac] = await Promise.all([
-    supabase.from("searches").select("id,name,start,end").order("start"),
-    supabase.from("applications").select("id,company,role,location,pay,url,source,stage,applied_on,notes,follow_up,history,record,search_id,kind,blocker,todo,todo_status").order("applied_on", { ascending: false }),
-    supabase.from("assessments").select("id,company,role,platform,minutes,invited,due,status,notes"),
-    supabase.from("actions").select("id,company,text,type,due,note,done"),
-  ]);
-  for (const r of [s, a, as, ac]) if (r.error) throw new Error("jobs: " + r.error.message);
+  // One RPC (migration 0009) instead of four requests; RLS applies inside the function (security invoker).
+  const { data: st, error } = await supabase.rpc("get_jobs_state");
+  if (error) throw new Error("jobs: " + error.message);
+  const state = (st ?? {}) as { searches?: Search[]; applications?: Application[]; assessments?: Assessment[]; actions?: Action[] };
+  const s = { data: state.searches ?? [] }, a = { data: state.applications ?? [] }, as = { data: state.assessments ?? [] }, ac = { data: state.actions ?? [] };
   let searches = (s.data ?? []) as Search[];
   if (!searches.length) {
     const first = ((a.data ?? []) as Application[]).map((x) => x.applied_on).sort()[0] ?? today;
