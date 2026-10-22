@@ -90,7 +90,7 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
   const budget = day.day_plan.time_available;
   const essential = day.goals.find((g) => g.id === day.day_plan!.focus_goal_id) ?? null;
   const alloc = day.day_plan.allocations ?? {};
-  const hourGoal = day.goals.find((g) => g.area === "craft" || g.area === "career") ?? null;
+  const hourGoal = day.goals.find((g) => g.area === "craft") ?? day.goals.find((g) => g.area === "career") ?? null;
   const hasHour = !!hourGoal || summary.sessions_total > 0;
   const hourBudget = hourGoal && alloc[hourGoal.id] != null ? alloc[hourGoal.id] : budget;
   const fit = fitSlots(plan, hourBudget);
