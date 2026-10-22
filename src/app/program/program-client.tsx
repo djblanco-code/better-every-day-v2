@@ -1,4 +1,5 @@
 "use client";
+import { Shell } from "../shell";
 import { useEffect, useState, useTransition } from "react";
 import { getProgram, type ProgramData } from "./actions";
 import { markDone } from "../today/actions";
@@ -81,7 +82,6 @@ export function ProgramClient() {
   );
 }
 
-function Shell({ children }: { children: React.ReactNode }) { return <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-4 bg-neutral-50 px-4 py-6 text-neutral-900 sm:px-6">{children}</main>; }
 function Stat({ label, value }: { label: string; value: string }) { return <div className="rounded-2xl border border-neutral-200 bg-white p-4"><p className="text-xs text-neutral-500">{label}</p><p className="mt-1 text-2xl font-semibold">{value}</p></div>; }
 function Card({ title, sub, right, children }: { title: string; sub?: string; right?: React.ReactNode; children: React.ReactNode }) {
   return <section className="rounded-2xl border border-neutral-200 bg-white p-5"><div className="mb-3 flex items-start justify-between gap-3"><div><h2 className="font-medium">{title}</h2>{sub ? <p className="text-xs text-neutral-500">{sub}</p> : null}</div>{right}</div>{children}</section>;

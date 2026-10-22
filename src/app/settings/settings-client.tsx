@@ -1,4 +1,5 @@
 "use client";
+import { Shell } from "../shell";
 import { useState, useTransition } from "react";
 import { clearKey, saveSettings, testKey, type SettingsView } from "./actions";
 
@@ -22,7 +23,7 @@ export function SettingsClient({ initial }: { initial: SettingsView }) {
   const remove = () => start(async () => { if (!confirm("Remove the saved API key?")) return; await clearKey(); setS({ ...s, key_hint: null }); setMsg("Key removed."); });
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-2xl flex-col gap-5 bg-neutral-50 px-4 py-6 text-neutral-900 sm:px-6">
+    <Shell width="form" gap="gap-5">
       <div className="flex items-end justify-between gap-3">
         <div><a href="/today" className="text-sm text-neutral-600 hover:underline">← Today</a><h1 className="text-3xl font-semibold tracking-tight">Settings</h1></div>
         <span className="text-sm text-neutral-500">{s.email}</span>
@@ -54,7 +55,7 @@ export function SettingsClient({ initial }: { initial: SettingsView }) {
         <p className="font-medium text-neutral-900">Your data</p>
         <p className="mt-1"><a className="underline" href="/api/account/export">Download everything</a> as JSON. Account deletion lives here too once the owner enables it on this deployment.</p>
       </section>
-    </main>
+    </Shell>
   );
 }
 

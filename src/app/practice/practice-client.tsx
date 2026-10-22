@@ -1,4 +1,5 @@
 "use client";
+import { Shell } from "../shell";
 import { useEffect, useMemo, useState } from "react";
 import { getPractice, type PracticeData } from "./actions";
 import type { Track } from "@/lib/recall/types";
@@ -30,7 +31,7 @@ export function PracticeClient({ initialTrack }: { initialTrack: string }) {
   const href = (id: string) => `/practice/${track}/${encodeURIComponent(id)}`;
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-5xl flex-col gap-4 bg-neutral-50 px-4 py-6 text-neutral-900 sm:px-6">
+    <Shell>
       <div><a href="/today" className="text-sm text-neutral-600 hover:underline">← Today</a><h1 className="text-3xl font-semibold tracking-tight">Practice</h1></div>
       <div className="flex flex-wrap gap-1 rounded-xl bg-neutral-200/60 p-1 self-start">{TRACKS.map((t) => <button key={t} onClick={() => { setTrack(t); setF({ ...f, c: "", list: "", co: "" }); }} className={`rounded-lg px-3 py-1.5 text-sm ${t === track ? "bg-white shadow-sm" : "text-neutral-600"}`}>{TRACK_NAME[t]}</button>)}</div>
       {!D ? <p className="text-neutral-500">Loading…</p> : (
@@ -67,6 +68,6 @@ export function PracticeClient({ initialTrack }: { initialTrack: string }) {
           </div>
         </>
       )}
-    </main>
+    </Shell>
   );
 }

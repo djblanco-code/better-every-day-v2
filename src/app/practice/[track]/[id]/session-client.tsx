@@ -1,4 +1,5 @@
 "use client";
+import { Shell } from "../../../shell";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { saveDraft } from "./actions";
@@ -43,7 +44,7 @@ export function SessionClient(props: {
   const clockColor = startedAt == null ? "" : left < 0 ? "text-red-600" : left < 120000 ? "text-amber-600" : "";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-4xl flex-col gap-4 bg-neutral-50 px-4 py-5 text-neutral-900 sm:px-6">
+    <Shell width="wide">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <a href="/today" className="text-sm text-neutral-600 hover:underline">← Today</a>
         <div className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-white px-4 py-2">
@@ -94,6 +95,6 @@ export function SessionClient(props: {
         {grading && grading !== "…" ? <span role="alert" className="text-red-700">{grading}</span> : null}
         <span role="status" aria-live="polite" className="text-neutral-500">{text.length} chars · {saved === "saved" ? "saved" : saved === "saving" ? "saving…" : saved === "error" ? "not saved (offline?)" : "unsaved"}</span>
       </div>
-    </main>
+    </Shell>
   );
 }

@@ -37,15 +37,17 @@ export function HomeClient({ email, counts }: { email: string; counts: { apps: n
     <Shell>
       <InstallHint />
       <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-sm text-neutral-500">{today}</p><h1 className="text-3xl font-semibold tracking-tight">Better Every Day</h1><p className="text-sm text-neutral-500">Two things, every day: move the job search forward, and get sharper for the interviews.</p></div><form action="/auth/sign-out" method="post"><button className="text-sm text-neutral-500 hover:underline">{email} · Sign out</button></form></div>
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(320px,420px)]">
       <Card title="What did you do today?" sub="A job fair, people you met, a mock interview, a real one. Say it or type it; it gets sorted into Network and Recall.">
         <textarea className="min-h-[88px] w-full rounded-lg border border-neutral-300 px-3 py-2 text-sm" value={text} onChange={(e) => setText(e.target.value)} placeholder="Went to the NYC tech meetup, met three people. Did a mock interview, aced it. Google phone screen went okay." />
         <div className="mt-2 flex flex-wrap items-center gap-2">{canMic ? <button className={listening ? "inline-flex h-9 items-center rounded-lg bg-red-600 px-3 text-sm font-medium text-white" : btnGhost} onClick={mic}>{listening ? "Stop" : "Speak"}</button> : <span className="text-xs text-neutral-400">Dictation needs Chrome or Safari.</span>}<button className={btn} disabled={busy} onClick={save}>Save</button>{msg ? <span role="status" aria-live="polite" className="text-sm text-neutral-600">{msg}</span> : null}{J && !J.has_key ? <span className="text-xs text-neutral-500">Add an AI key in <Link className="underline" href="/settings">Settings</Link> and notes get sorted into people, events and interviews.</span> : null}</div>
         {J?.entries.length ? <ul className="mt-4 divide-y divide-neutral-100">{J.entries.slice(0, 8).map((e) => <li key={e.id} className="flex items-start gap-3 py-3"><div className="min-w-0 flex-1"><p className="text-xs text-neutral-500">{e.date} {e.time}</p><p className="text-sm">{e.summary || e.text}</p>{e.items.length ? <div className="mt-1 flex flex-wrap gap-1">{e.items.map((i) => <span key={i.id} className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs">{line(i)}</span>)}</div> : e.parse_error ? <p className="text-xs text-amber-700">Saved as a note only: {e.parse_error}</p> : null}</div><button className="text-xs text-neutral-400 hover:text-red-700" onClick={async () => { if (confirm("Remove this entry and what it added?")) { await deleteEntry(e.id); load(); } }}>Remove</button></li>)}</ul> : null}
       </Card>
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-1 lg:content-start">
         {tile("/jobs", "Job Tracker", "Applications, follow-ups, assessments to do, calls to book.", [["applied", counts.apps], ["need you", counts.need, counts.need > 0], ["in interviews", counts.interviewing]], "Open Job Tracker")}
         {tile("/today", "Recall", "One hour a day for six months: LeetCode, Python, System Design, DSA and debugging, graded and scheduled.", [["day streak", counts.streak, counts.streak > 0], ["minutes today", counts.minutes, counts.minutes >= 60], ["readiness", `${counts.readiness}%`]], "Open Recall")}
         {tile("/network", "Network", "People you met, mentors, events, and who can connect you to what.", [["people", counts.people], ["events", counts.events], ["follow-ups", counts.follow_ups, counts.follow_ups > 0]], "Open Network")}
+      </div>
       </div>
     </Shell>
   );

@@ -1,3 +1,4 @@
+import { Shell } from "@/app/shell";
 import { notFound, redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
@@ -26,7 +27,7 @@ export default async function Result({ params }: { params: Promise<{ sid: string
     ["communication", "Communication"],
   ];
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-4 bg-neutral-50 px-4 py-6 text-neutral-900 sm:px-6">
+    <Shell width="read">
       <div><a href="/today" className="text-sm text-neutral-600 hover:underline">← Today</a>
         <h1 className="text-2xl font-semibold tracking-tight">{s.title}</h1>
         <p className="text-sm text-neutral-500">{TRACK_NAME[track]} · {s.date} {s.time} · {s.minutes_used} of {s.timer_minutes} min · grader v{s.grader} · {s.model}</p></div>
@@ -55,7 +56,7 @@ export default async function Result({ params }: { params: Promise<{ sid: string
         <a href={`/practice/${track}/${encodeURIComponent(s.item_id)}`} className="inline-flex h-10 items-center rounded-lg border border-neutral-300 px-4 text-sm hover:bg-neutral-50">Try it again</a>
         <a href="/today" className="inline-flex h-10 items-center rounded-lg bg-neutral-900 px-4 text-sm font-medium text-white hover:bg-neutral-800">Back to Today</a>
       </div>
-    </main>
+    </Shell>
   );
 }
 function Card({ title, children }: { title: string; children: React.ReactNode }) {
