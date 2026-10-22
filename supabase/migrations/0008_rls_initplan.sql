@@ -3,7 +3,7 @@
 -- Generic: every policy in `public` whose expression mentions a bare auth.uid() is dropped and recreated with the
 -- same name, command, roles and expressions, only the call wrapped. Idempotent: a second run finds nothing to change.
 do $$
-declare p record; q text; w text; roles text;
+declare p record; q text; w text; rl text;
 begin
   for p in
     select schemaname, tablename, policyname, cmd, permissive, qual, with_check, array_to_string(roles, ', ') as r
@@ -15,12 +15,12 @@ begin
   loop
     q := replace(p.qual, 'auth.uid()', '(select auth.uid())');
     w := replace(p.with_check, 'auth.uid()', '(select auth.uid())');
-    roles := p.r;
+    rl := p.r;
     execute format('drop policy %I on %I.%I', p.policyname, p.schemaname, p.tablename);
     execute format('create policy %I on %I.%I as %s for %s to %s %s %s',
       p.policyname, p.schemaname, p.tablename,
       case when p.permissive = 'PERMISSIVE' then 'permissive' else 'restrictive' end,
-      lower(p.cmd), roles,
+      lower(p.cmd), rl,
       case when q is not null then 'using (' || q || ')' else '' end,
       case when w is not null then 'with check (' || w || ')' else '' end);
   end loop;
