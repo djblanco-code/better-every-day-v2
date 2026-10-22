@@ -9,6 +9,7 @@ import { buildPlan, recommend } from "@/lib/recall/engine";
 import { planView, summary, type PlanView, type Summary } from "@/lib/recall/plan";
 import type { PracticeSlot } from "@/lib/recall/types";
 import { sessionUser } from "@/lib/supabase/session";
+import { dueToday, type Checkin, type Habit } from "@/lib/life/types";
 
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
 
@@ -29,7 +30,75 @@ async function ctx(today?: string) {
   return { supabase, user: data.user, today: d, banks, cur, st };
 }
 
-export interface TodayData { plan: PlanView; summary: Summary; today: string }
+export interface DueItem { kind: "assessment" | "call" | "follow_up"; id: string; title: string; detail: string; due: string | null; overdue: boolean; href: string }
+export interface DayExtras {
+  checkin: Checkin | null;
+  habits: { habit: Habit; done: boolean }[];      // active habits due today
+  due: DueItem[];                                  // assessments, intro calls, network follow-ups
+  spent_cents: number; limit_cents: number;        // money, this month
+}
+export interface TodayData { plan: PlanView; summary: Summary; today: string; day: DayExtras }
+
+/** Everything on Today that is not the Recall plan. One parallel fetch; each table is RLS-scoped. */
+async function dayExtras(c: Awaited<ReturnType<typeof ctx>>): Promise<DayExtras> {
+  const today = c.today, soon = (() => { const d = new Date(today + "T12:00"); d.setDate(d.getDate() + 3); return d.toISOString().slice(0, 10); })();
+  const [ck, hb, hl, as, ac, pp, tx, bg] = await Promise.all([
+    c.supabase.from("checkins").select("date,sleep_hours,energy,mood,exercise_minutes,weight,time_available,note").eq("date", today).maybeSingle(),
+    c.supabase.from("habits").select("id,name,icon,cadence,target_per_week,active,sort").eq("active", true).order("sort"),
+    c.supabase.from("habit_logs").select("habit_id,done").eq("date", today),
+    c.supabase.from("assessments").select("id,company,role,platform,due,status").in("status", ["todo", "expired"]),
+    c.supabase.from("actions").select("id,company,text,due,done").eq("done", false),
+    c.supabase.from("people").select("id,name,company,follow_up,follow_up_done").eq("follow_up_done", false).neq("follow_up", ""),
+    c.supabase.from("transactions").select("amount_cents").eq("kind", "expense").gte("date", today.slice(0, 7) + "-01"),
+    c.supabase.from("budgets").select("limit_cents"),
+  ]);
+  const doneIds = new Set(((hl.data ?? []) as { habit_id: string; done: boolean }[]).filter((l) => l.done).map((l) => l.habit_id));
+  const habits = ((hb.data ?? []) as Habit[]).filter((h) => dueToday(h, today)).map((habit) => ({ habit, done: doneIds.has(habit.id) }));
+  const due: DueItem[] = [];
+  for (const a of (as.data ?? []) as { id: string; company: string; role: string; platform: string; due: string | null }[]) {
+    if (!a.due || a.due <= soon) due.push({ kind: "assessment", id: a.id, title: `${a.company} assessment`, detail: [a.platform, a.role].filter(Boolean).join(" · "), due: a.due, overdue: !!a.due && a.due < today, href: "/jobs/action" });
+  }
+  for (const a of (ac.data ?? []) as { id: string; company: string; text: string; due: string | null }[]) {
+    if (!a.due || a.due <= soon) due.push({ kind: "call", id: a.id, title: `${a.company}: ${a.text}`, detail: "intro call to set up", due: a.due, overdue: !!a.due && a.due < today, href: "/jobs/action" });
+  }
+  for (const p of ((pp.data ?? []) as { id: string; name: string; company: string; follow_up: string }[]).slice(0, 5)) {
+    due.push({ kind: "follow_up", id: p.id, title: p.follow_up, detail: `${p.name}${p.company ? ` · ${p.company}` : ""}`, due: null, overdue: false, href: "/network" });
+  }
+  due.sort((a, b) => (a.overdue === b.overdue ? (a.due ?? "9999").localeCompare(b.due ?? "9999") : a.overdue ? -1 : 1));
+  const ckRow = (ck.data ?? null) as Checkin | null;
+  return {
+    checkin: ckRow ? { ...ckRow, sleep_hours: ckRow.sleep_hours == null ? null : Number(ckRow.sleep_hours), weight: ckRow.weight == null ? null : Number(ckRow.weight) } : null,
+    habits, due: due.slice(0, 10),
+    spent_cents: ((tx.data ?? []) as { amount_cents: number }[]).reduce((a, t) => a + t.amount_cents, 0),
+    limit_cents: ((bg.data ?? []) as { limit_cents: number }[]).reduce((a, b) => a + b.limit_cents, 0),
+  };
+}
+async function out(c: Awaited<ReturnType<typeof ctx>>, plan: Parameters<typeof planView>[0]): Promise<TodayData> {
+  return { plan: planView(plan, c.st, c.cur, c.today), summary: summary(c.st, c.banks, c.cur, c.today), today: c.today, day: await dayExtras(c) };
+}
+
+/** Minutes the user can give Recall today. Stored on the check-in row; the plan trims to it on the client. */
+export async function setTimeAvailable(minutes: number | null, clientDate?: string): Promise<TodayData> {
+  const m = parse(z.number().int().min(0).max(600).nullable(), minutes);
+  const c = await ctx(clientDate);
+  const { data: cur } = await c.supabase.from("checkins").select("*").eq("date", c.today).maybeSingle();
+  const { error } = await c.supabase.from("checkins").upsert({ ...(cur ?? {}), user_id: c.user.id, date: c.today, time_available: m, updated_at: new Date().toISOString() });
+  if (error) throw new Error(error.message);
+  revalidatePath("/today");
+  const plan = c.st.plans[c.today] ?? buildPlan(c.st, c.banks, c.cur, c.today);
+  return out(c, plan);
+}
+
+/** Tick a habit from Today. */
+export async function tickHabit(habit_id: string, done: boolean, clientDate?: string): Promise<TodayData> {
+  const hid = parse(idS, habit_id);
+  const c = await ctx(clientDate);
+  const { error } = await c.supabase.from("habit_logs").upsert({ user_id: c.user.id, habit_id: hid, date: c.today, done: !!done });
+  if (error) throw new Error(error.message);
+  revalidatePath("/today"); revalidatePath("/life");
+  const plan = c.st.plans[c.today] ?? buildPlan(c.st, c.banks, c.cur, c.today);
+  return out(c, plan);
+}
 
 /** Today's plan, generated once per day and then fixed (it must not shift under the user). */
 export async function getToday(clientDate?: string): Promise<TodayData> {
@@ -42,7 +111,7 @@ export async function getToday(clientDate?: string): Promise<TodayData> {
     if (!started) await saveProgram(c.supabase, c.user.id, { start: c.st.program.start! });
     c.st.plans[c.today] = plan;
   }
-  return { plan: planView(plan, c.st, c.cur, c.today), summary: summary(c.st, c.banks, c.cur, c.today), today: c.today };
+  return out(c, plan);
 }
 
 /** Replace one practice slot's problem with the next recommendation, excluding what was there. */
@@ -60,7 +129,7 @@ export async function swapSlot(n: number, clientDate?: string): Promise<TodayDat
   plan.slots[n] = next;
   await savePlan(c.supabase, c.user.id, plan);
   revalidatePath("/today");
-  return { plan: planView(plan, c.st, c.cur, c.today), summary: summary(c.st, c.banks, c.cur, c.today), today: c.today };
+  return out(c, plan);
 }
 
 /** Tick (or untick) a reading/homework item; its minutes count toward today. */
@@ -81,7 +150,7 @@ export async function markDone(id: string, minutes: number, undo = false, client
   c.st.program.done = done; c.st.program.minutes = mins;
   revalidatePath("/today");
   const plan = c.st.plans[c.today] ?? buildPlan(c.st, c.banks, c.cur, c.today);
-  return { plan: planView(plan, c.st, c.cur, c.today), summary: summary(c.st, c.banks, c.cur, c.today), today: c.today };
+  return out(c, plan);
 }
 
 /** Extra study minutes outside a graded session. */
@@ -95,7 +164,7 @@ export async function logMinutes(minutes: number, clientDate?: string): Promise<
   c.st.program.minutes = mins;
   revalidatePath("/today");
   const plan = c.st.plans[c.today] ?? buildPlan(c.st, c.banks, c.cur, c.today);
-  return { plan: planView(plan, c.st, c.cur, c.today), summary: summary(c.st, c.banks, c.cur, c.today), today: c.today };
+  return out(c, plan);
 }
 
 /** A mock or real interview done outside the app. Counts toward minutes, streak and metrics. */
