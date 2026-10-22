@@ -60,7 +60,7 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
       <Shell width="wide">
         {top}
         <header className="rise mx-auto w-full max-w-2xl">
-          <p className="text-sm text-neutral-500">{greeting} · {dateLabel} · week {plan.week}</p>
+          <p className="text-sm text-neutral-500">{greeting} · {dateLabel}</p>
           <h1 className="text-3xl sm:text-4xl">Let&apos;s make your daily plan.</h1>
         </header>
         <DayPlanCard goals={day.goals} pending={pending} defaultTime={budget ?? 60} onDone={(v) => { setMaking(true); const started = Date.now(); start(async () => { try { const next = await makeDayPlan(v, localDate()); const wait = Math.max(0, 1400 - (Date.now() - started)); await new Promise((r) => setTimeout(r, wait)); setData(next); } catch (e) { setErr(String((e as Error)?.message ?? e)); } finally { setMaking(false); } }); }} />
@@ -73,7 +73,7 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
       {top}
       <header className="rise flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-sm text-neutral-500">{greeting} · {dateLabel} · week {plan.week}</p>
+          <p className="text-sm text-neutral-500">{greeting} · {dateLabel}</p>
           <h1 className="text-3xl sm:text-4xl">{plan.complete ? "Hour done." : pct ? `${plan.target - Math.round(plan.minutes_done)} minutes to go.` : summary.sessions_total === 0 ? "Your first hour." : "Your hour."}</h1>
         </div>
         <Ring pct={pct} label={`${Math.round(plan.minutes_done)}`} sub={`of ${plan.target}`} />
@@ -87,6 +87,11 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
         <button className="text-neutral-600 hover:underline" onClick={() => run(() => clearDayPlan(localDate()))}>Change</button>
       </section>
 
+
+      {/* Any updates? Short by design; what it finds lands in Network, Recall and Life. Evenings get the accent. */}
+      <div className={`rise rise-2 ${evening ? "rounded-2xl ring-2 ring-accent/30" : ""}`}>
+        <JournalCard compact onSaved={() => run(() => getToday(localDate()))} />
+      </div>
 
       {/* The plan. Done → it folds to one line. */}
       <section className="rise rise-3 space-y-3">
@@ -115,10 +120,6 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
         </section>
       ) : null}
 
-      {/* Evening: the journal leads. */}
-      <div className={`rise rise-4 ${evening ? "rounded-2xl ring-2 ring-accent/30" : ""}`}>
-        <JournalCard onSaved={() => run(() => getToday(localDate()))} />
-      </div>
     </Shell>
   );
 }
