@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppNav } from "./app-nav";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { supabaseServer } from "@/lib/supabase/server";
 import { sessionUser } from "@/lib/supabase/session";
 
@@ -50,6 +51,7 @@ export default async function RootLayout({
       >
         <AppNav signedIn={signedIn} />
         <div className="pb-20 md:pb-0">{children}</div>
+        <SpeedInsights />
       </body>
     </html>
   );

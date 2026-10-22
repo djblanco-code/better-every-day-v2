@@ -38,3 +38,10 @@
 that prevents it. Set `CRON_SECRET` in Vercel (Production) to any random string: Vercel then sends it as a bearer
 token and the route refuses everyone else. Without it the route is public but harmless (clock only). If the project
 does pause anyway, restore it from the Supabase dashboard; the data is kept.
+
+## Real-user performance (5.6)
+Vercel Speed Insights (`<SpeedInsights />` in the root layout; enabled in the Vercel project under Speed Insights)
+records Core Web Vitals from real visits. Read it at the 75th percentile over 28 days, the way Google scores it:
+LCP <= 2.5 s, INP <= 200 ms, CLS <= 0.1 are "good". The PRD target for /today (under 1 s on 4G) is stricter than the
+standard. Lighthouse in CI stays as the lab check on every PR; this is the field check. Hobby keeps a limited number
+of data points per month, enough for a few users.
