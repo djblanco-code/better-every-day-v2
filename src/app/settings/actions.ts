@@ -4,6 +4,7 @@ import { isoDate, parse, shortText } from "@/lib/validate";
 import { revalidatePath } from "next/cache";
 import { supabaseServer } from "@/lib/supabase/server";
 import { callModel, DEFAULT_MODEL, type Provider } from "@/lib/ai/callModel";
+import { sessionUser } from "@/lib/supabase/session";
 
 export interface SettingsView {
   email: string; provider: Provider; model: string; key_hint: string | null; company_focus: string; default_minutes: number;
@@ -12,7 +13,7 @@ export interface SettingsView {
 
 async function ctx() {
   const supabase = await supabaseServer();
-  const { data } = await supabase.auth.getUser();
+  const data = await sessionUser(supabase);
   if (!data.user) throw new Error("signed out");
   return { supabase, user: data.user };
 }

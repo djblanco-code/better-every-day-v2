@@ -8,6 +8,7 @@ import { findItem, loadBanks } from "@/lib/recall/banks";
 import { schedule } from "@/lib/recall/engine";
 import { BANDS, DEBUG_GRADER, GRADER, GRADER_VERSION, GRADE_SCHEMA } from "@/lib/recall/graders";
 import { TRACKS, type Progress, type Track } from "@/lib/recall/types";
+import { sessionUser } from "@/lib/supabase/session";
 
 interface Grade { score: number; correctness: number; complexity: number; code_quality: number; communication: number; verdict: string; strengths: string[]; gaps: string[]; next_step: string; model_outline: string }
 const n10 = (v: unknown) => Math.max(0, Math.min(10, Math.round(Number(v) || 0)));
@@ -19,7 +20,7 @@ export async function assess(input: { track: string; id: string; answer: string;
   const track = input.track as Track;
   if (!(TRACKS as string[]).includes(track)) throw new Error("bad track");
   const supabase = await supabaseServer();
-  const { data: auth } = await supabase.auth.getUser();
+  const auth = await sessionUser(supabase);
   if (!auth.user) throw new Error("signed out");
   const { banks } = await loadBanks(supabase);
   const item = findItem(banks, track, input.id);

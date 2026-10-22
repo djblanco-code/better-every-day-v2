@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppNav } from "./app-nav";
 import { supabaseServer } from "@/lib/supabase/server";
+import { sessionUser } from "@/lib/supabase/session";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,7 +42,7 @@ export default async function RootLayout({
   // Only the env check is guarded: a missing env (first deploy, CI build) must not crash the shell, but Next's own
   // "this route is dynamic" signal thrown by cookies() must propagate, or static pages fail to prerender (Next 16).
   const hasEnv = !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY);
-  const signedIn = hasEnv ? !!(await (await supabaseServer()).auth.getUser()).data.user : false;
+  const signedIn = hasEnv ? !!(await sessionUser(await supabaseServer())).user : false;
   return (
     <html lang="en">
       <body

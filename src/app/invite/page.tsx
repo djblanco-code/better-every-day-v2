@@ -2,12 +2,13 @@ import { redirect } from "next/navigation";
 import { supabaseServer } from "@/lib/supabase/server";
 import { SIGN_IN_PATH } from "@/lib/auth/routes";
 import { InviteForm } from "./form";
+import { sessionUser } from "@/lib/supabase/session";
 
 // Signed in but not yet invited. The code is checked inside Postgres (accept_invite, security definer), so
 // neither this page nor the browser can flip the flag on its own.
 export default async function Invite() {
   const supabase = await supabaseServer();
-  const { data } = await supabase.auth.getUser();
+  const data = await sessionUser(supabase);
   if (!data.user) redirect(SIGN_IN_PATH);
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6">

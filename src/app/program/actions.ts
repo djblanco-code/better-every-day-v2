@@ -6,6 +6,7 @@ import { loadState, saveProgram } from "@/lib/recall/store";
 import { addDays, weekNo } from "@/lib/recall/engine";
 import { metrics, type Metrics } from "@/lib/recall/metrics";
 import type { Curriculum } from "@/lib/recall/types";
+import { sessionUser } from "@/lib/supabase/session";
 
 const validDate = (d?: string) => cd(d);
 
@@ -17,7 +18,7 @@ export interface ProgramData {
 
 export async function getProgram(clientDate?: string): Promise<ProgramData> {
   const supabase = await supabaseServer();
-  const { data } = await supabase.auth.getUser();
+  const data = await sessionUser(supabase);
   if (!data.user) throw new Error("signed out");
   const today = validDate(clientDate);
   const [{ banks, cur }, st] = await Promise.all([loadBanks(supabase), loadState(supabase, today)]);

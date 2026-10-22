@@ -7,12 +7,13 @@ import { supabaseServer } from "@/lib/supabase/server";
 import { loadJobs, newId } from "@/lib/jobs/store";
 import { lookup, type Lookup } from "@/lib/jobs/lookup";
 import { STAGES, type Action, type Application, type Assessment, type JobsState, type Stage } from "@/lib/jobs/types";
+import { sessionUser } from "@/lib/supabase/session";
 
 const validDate = (d?: string) => cd(d);
 
 async function ctx() {
   const supabase = await supabaseServer();
-  const { data } = await supabase.auth.getUser();
+  const data = await sessionUser(supabase);
   if (!data.user) throw new Error("signed out");
   return { supabase, uid: data.user.id };
 }

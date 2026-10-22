@@ -2,6 +2,7 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { publicEnv } from "@/lib/env";
 import { isProtected, INVITE_PATH, SIGN_IN_PATH, redirectFor } from "@/lib/auth/routes";
+import { sessionUser } from "@/lib/supabase/session";
 
 // Refreshes the Supabase session cookie on every request and applies the routing rules in lib/auth/routes.
 export async function proxy(request: NextRequest) {
@@ -33,8 +34,8 @@ export async function proxy(request: NextRequest) {
     to.searchParams.set("next", request.nextUrl.searchParams.get("next") ?? "/today");
     return NextResponse.redirect(to);
   }
-  // getUser() validates the JWT with Supabase; getSession() would trust the cookie blindly.
-  const { data } = await supabase.auth.getUser();
+  // sessionUser() verifies the JWT signature locally (asymmetric keys); getSession() would trust the cookie blindly.
+  const data = await sessionUser(supabase);
   const path = request.nextUrl.pathname;
   // The invite flag is only read on pages the gate applies to: one indexed row, under RLS.
   let invited = true;
