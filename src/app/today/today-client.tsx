@@ -8,7 +8,7 @@ import { JournalCard } from "../journal/journal-card";
 import type { PlanView, SlotView } from "@/lib/recall/plan";
 import type { Track } from "@/lib/recall/types";
 import { money } from "@/lib/life/types";
-import { areaLabel, type Goal } from "@/lib/goals/types";
+import { areaLabel, encouragement, type Goal } from "@/lib/goals/types";
 
 const TRACK_NAME: Record<Track, string> = { leetcode: "LeetCode", python: "Python", system_design: "System Design", dsa: "Data Structures & Algorithms", debugging: "Debugging" };
 const localDate = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; };
@@ -17,32 +17,31 @@ const hourNow = () => new Date().getHours();
 // Home tells you what today is. One daily question (time); the goals are fixed; the time decides what is possible:
 // the hour's slots in order while they fit, then the goals' small items with the minutes left. Glanced at several
 // times a day, so the hour shows only the next slot that fits. docs/SOUL.md, PRD §4.7.
-type Possible = { key: string; goal: Goal | null; label: string; minutes: number; href: string; count?: number };
-
-function possibleToday(day: DayExtras, minutesLeft: number): { items: Possible[]; left: number } {
-  const items: Possible[] = [];
-  let left = minutesLeft;
-  const push = (p: Possible) => { if (p.minutes <= left) { items.push(p); left -= p.minutes; } };
-  for (const g of day.goals) {
-    if (g.area === "job") {
-      const due = day.due.filter((d) => d.href.startsWith("/jobs")).slice(0, 3);
-      if (due.length) push({ key: "due", goal: g, label: `${due.length} thing${due.length === 1 ? "" : "s"} due in Jobs`, minutes: 10 * due.length, href: "/jobs/pipeline", count: due.length });
-      if (day.leads) push({ key: "leads", goal: g, label: "Apply to 1 from Leads", minutes: 20, href: "/jobs/todo" });
-      if (day.stale) push({ key: "stale", goal: g, label: `Nudge or close ${Math.min(day.stale, 5)} quiet application${day.stale === 1 ? "" : "s"}`, minutes: 5, href: "/jobs/pipeline" });
-    } else if (g.area === "network") {
-      const fu = day.due.filter((d) => d.href === "/network").slice(0, 3);
-      if (fu.length) push({ key: "followups", goal: g, label: `${fu.length} follow-up${fu.length === 1 ? "" : "s"} to send`, minutes: 10 * fu.length, href: "/network", count: fu.length });
-      else push({ key: "network-one", goal: g, label: "Reach out to one person", minutes: 10, href: "/network" });
-    } else if (g.area === "health") {
-      const open = day.habits.filter((h) => !h.done);
-      if (open.length) push({ key: "habits", goal: g, label: `${open.length} habit${open.length === 1 ? "" : "s"} left today`, minutes: 0, href: "/life", count: open.length });
-    } else if (g.area === "money") {
-      push({ key: "money", goal: g, label: "Log today's spending", minutes: 3, href: "/life" });
-    } else if (g.area === "learn") {
-      push({ key: "learn", goal: g, label: "20 minutes on it", minutes: 20, href: "/life" });
-    }
+type Suggestion = { label: string; href: string };
+/** Concrete things for a goal's area, from what the app already knows. Never more than two per goal. */
+function suggestionsFor(area: Goal["area"], day: DayExtras, hasHour: boolean): Suggestion[] {
+  const out: Suggestion[] = [];
+  if (area === "career") {
+    const due = day.due.filter((d) => d.href.startsWith("/jobs"));
+    if (due.length) out.push({ label: `${due.length} thing${due.length === 1 ? "" : "s"} due in Jobs`, href: "/jobs/pipeline" });
+    if (day.leads) out.push({ label: "Apply to one from Leads", href: "/jobs/todo" });
+    if (!out.length && day.stale) out.push({ label: `Nudge or close ${Math.min(day.stale, 5)} quiet applications`, href: "/jobs/pipeline" });
+  } else if (area === "craft") {
+    if (hasHour) out.push({ label: "The hour below", href: "#hour" }); else out.push({ label: "Practice, read, or build for the minutes you gave it", href: "/practice" });
+  } else if (area === "body") {
+    const open = day.habits.filter((h) => !h.done);
+    out.push(open.length ? { label: `${open.length} habit${open.length === 1 ? "" : "s"} left today`, href: "/life" } : { label: "Habits done. Move, sleep, eat well.", href: "/life" });
+  } else if (area === "mind") {
+    out.push({ label: "Three honest lines in Any updates", href: "#updates" });
+  } else if (area === "money") {
+    out.push({ label: "Log today's spending", href: "/life" });
+  } else if (area === "people") {
+    const fu = day.due.filter((d) => d.href === "/network");
+    out.push(fu.length ? { label: `${fu.length} follow-up${fu.length === 1 ? "" : "s"} to send`, href: "/network" } : { label: "Reach out to one person", href: "/network" });
+  } else {
+    out.push({ label: "Give it the minutes you promised", href: "/goals" });
   }
-  return { items, left };
+  return out.slice(0, 2);
 }
 
 export function TodayClient({ counts, top }: { counts: { apps: number; interviewing: number; people: number; events: number }; top?: React.ReactNode }) {
@@ -51,6 +50,7 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
   const [extra, setExtra] = useState("");
   const [making, setMaking] = useState(false);
   const [showRest, setShowRest] = useState(false);
+  const [line, setLine] = useState<string | null>(null);
   const [pending, start] = useTransition();
 
   useEffect(() => { getToday(localDate()).then(setData).catch((e) => setErr(String(e?.message ?? e))); }, []);
@@ -65,7 +65,7 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
   const dateLabel = new Date(data.today + "T12:00").toLocaleDateString(undefined, { weekday: "long", month: "long", day: "numeric" });
   const pct = Math.min(100, Math.round((100 * plan.minutes_done) / plan.target));
 
-  if (making) return <Shell width="wide">{top}<MakingPlan /></Shell>;
+  if (making) return <Shell width="wide">{top}<MakingPlan line={line} /></Shell>;
   if (!day.day_plan) {
     return (
       <Shell width="wide">
@@ -74,23 +74,35 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
           <p className="text-sm text-neutral-500">{greeting} · {dateLabel}</p>
           <h1 className="text-3xl sm:text-4xl">Let&apos;s make your daily plan.</h1>
         </header>
-        <DayPlanCard pending={pending} onDone={(minutes) => { setMaking(true); const started = Date.now(); start(async () => { try { const next = await makeDayPlan({ time_available: minutes, focus_goal_id: null, energy: null }, localDate()); await new Promise((r) => setTimeout(r, Math.max(0, 1400 - (Date.now() - started)))); setData(next); } catch (e) { setErr(String((e as Error)?.message ?? e)); } finally { setMaking(false); } }); }} />
+        <DayPlanCard goals={day.goals} pending={pending} onDone={(v) => {
+          const ess = day.goals.find((g) => g.id === v.focus_goal_id) ?? null;
+          const first = plan.slots.find((x) => !x.done);
+          const summary = encouragement(v.time_available, ess, first?.title ?? null);
+          setLine(summary); setMaking(true); const started = Date.now();
+          start(async () => { try { const next = await makeDayPlan({ ...v, summary }, localDate()); await new Promise((r) => setTimeout(r, Math.max(0, 2200 - (Date.now() - started)))); setData(next); } catch (e) { setErr(String((e as Error)?.message ?? e)); } finally { setMaking(false); } });
+        }} />
       </Shell>
     );
   }
 
-  // What fits: the hour's slots in order, then the goals' items with what is left.
+  // The day: the essential goal leads; minutes per goal come from the check-in; the hour belongs to a Craft or
+  // Career goal (or to anyone who has sessions already) and takes its minutes from that goal's allocation.
   const budget = day.day_plan.time_available;
-  const fit = fitSlots(plan, budget);
-  const nextSlot = plan.slots.find((s, i) => !s.done && fit.fits[i]) ?? null;
+  const essential = day.goals.find((g) => g.id === day.day_plan!.focus_goal_id) ?? null;
+  const alloc = day.day_plan.allocations ?? {};
+  const hourGoal = day.goals.find((g) => g.area === "craft") ?? day.goals.find((g) => g.area === "career") ?? null;
+  const hasHour = !!hourGoal || summary.sessions_total > 0;
+  const hourBudget = hourGoal && alloc[hourGoal.id] != null ? alloc[hourGoal.id] : budget;
+  const fit = fitSlots(plan, hourBudget);
+  const nextSlot = hasHour ? plan.slots.find((s, i) => !s.done && fit.fits[i]) ?? null : null;
   const nextIndex = nextSlot ? plan.slots.indexOf(nextSlot) : -1;
   const rest = plan.slots.filter((s) => s !== nextSlot);
-  const { items: possible } = possibleToday(day, Math.max(0, budget - fit.used));
+  const commitments = [...day.goals].filter((g) => (alloc[g.id] ?? 0) > 0 || g.id === essential?.id).sort((a, b) => (a.id === essential?.id ? -1 : b.id === essential?.id ? 1 : a.priority - b.priority));
   const habitsDone = day.habits.filter((h) => h.done).length;
   const todayLine = [
+    essential ? `Essential: ${essential.title}` : null,
     `${budget} min today`,
-    plan.complete ? "the hour is done" : nextSlot ? `next: ${nextSlot.title ?? "the next slot"} (${nextSlot.minutes} min${fit.over ? ", a little over" : ""})` : "the hour is done",
-    possible.length ? `then ${possible.map((p) => p.label.toLowerCase()).slice(0, 2).join(" and ")}` : null,
+    plan.complete ? "the hour is done" : nextSlot ? `next: ${nextSlot.title ?? "the next slot"} (${nextSlot.minutes} min${fit.over ? ", a little over" : ""})` : null,
   ].filter(Boolean).join(" · ");
 
   return (
@@ -106,17 +118,17 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
 
       {/* The one sentence. */}
       <section className="rise rise-2 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-accent/40 bg-white px-4 py-3">
-        <p className="text-base"><span className="font-medium">Today:</span> {todayLine}.</p>
+        <div><p className="text-base"><span className="font-medium">Today:</span> {todayLine}.</p>{day.day_plan.summary ? <p className="text-sm text-neutral-500">{day.day_plan.summary}</p> : null}</div>
         <button className="text-sm text-neutral-600 hover:underline" onClick={() => run(() => clearDayPlan(localDate()))}>Change</button>
       </section>
 
       <UpdatesLine onSaved={() => run(() => getToday(localDate()))} evening={hour >= 17} />
 
-      {/* The hour: the next slot that fits. */}
-      <section className="rise rise-3 space-y-3">
+      {/* The hour: the next slot that fits. Only for a Craft/Career goal, or anyone who already practises. */}
+      {hasHour ? <section id="hour" className="rise rise-3 space-y-3">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <h2 className="text-sm font-medium uppercase tracking-wide text-neutral-500">The hour</h2>
-          <span className="text-xs text-neutral-500">{fit.fits.filter(Boolean).length} of {plan.slots.length} fit in {budget} min{summary.due ? ` · ${summary.due} due for review` : ""}</span>
+          <span className="text-xs text-neutral-500">{fit.fits.filter(Boolean).length} of {plan.slots.length} fit in {hourBudget} min{summary.due ? ` · ${summary.due} due for review` : ""}</span>
         </div>
         {plan.complete ? (
           <div className="rounded-2xl border border-green-200 bg-green-50 p-5">
@@ -125,7 +137,7 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
           </div>
         ) : nextSlot ? (
           <SlotCard i={nextIndex} s={nextSlot} later={false} pending={pending} onSwap={() => run(() => swapSlot(nextIndex, localDate()))} onDone={(m) => run(() => markDone((nextSlot as { id: string }).id, m, false, localDate()))} onUndo={() => run(() => markDone((nextSlot as { id: string }).id, 0, true, localDate()))} />
-        ) : <p className="rounded-2xl border border-neutral-200 bg-white p-5 text-sm text-neutral-600">Nothing else fits in {budget} minutes. Change the time above, or log minutes you did elsewhere.</p>}
+        ) : <p className="rounded-2xl border border-neutral-200 bg-white p-5 text-sm text-neutral-600">Nothing else fits in {hourBudget} minutes. Change the time above, or log minutes you did elsewhere.</p>}
         {rest.length ? (
           <div>
             <button className="text-sm text-neutral-600 hover:underline" aria-expanded={showRest} onClick={() => setShowRest((v) => !v)}>{showRest ? "Hide the rest" : `Show the rest (${rest.length})`}</button>
@@ -137,16 +149,21 @@ export function TodayClient({ counts, top }: { counts: { apps: number; interview
           <button disabled={pending || !+extra} onClick={() => { run(() => logMinutes(+extra, localDate())); setExtra(""); }} className="h-8 rounded-lg px-2 hover:bg-neutral-100 disabled:opacity-50">Log minutes outside the app</button>
           <Link href="/program" className="ml-auto hover:underline">Readiness by track →</Link>
         </div>
-      </section>
+      </section> : null}
 
-      {/* What else fits today, from the goals. */}
+      {/* Your commitments: minutes per goal from the check-in, the essential one first, with concrete next steps. */}
       <section className="rise rise-4 space-y-2">
-        <h2 className="text-sm font-medium uppercase tracking-wide text-neutral-500">Also possible today</h2>
-        {possible.length ? (
+        <h2 className="text-sm font-medium uppercase tracking-wide text-neutral-500">Your commitments today</h2>
+        {commitments.length ? (
           <ul className="divide-y divide-neutral-100 rounded-2xl border border-neutral-200 bg-white">
-            {possible.map((p) => <li key={p.key} className="flex items-center gap-3 px-4 py-3"><div className="min-w-0 flex-1"><p className="text-sm font-medium">{p.label}</p><p className="text-xs text-neutral-500">{p.goal ? `${areaLabel(p.goal.area)} · ${p.goal.title}` : ""}{p.minutes ? ` · ~${p.minutes} min` : ""}</p></div><Link href={p.href} className="text-sm text-neutral-600 hover:underline">Open</Link></li>)}
+            {commitments.map((g) => { const sug = suggestionsFor(g.area, day, hasHour); return (
+              <li key={g.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
+                <div className="min-w-0 flex-1"><p className="text-sm font-medium">{g.title}{g.id === essential?.id ? <span className="ml-2 rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-700">essential</span> : null}</p><p className="text-xs text-neutral-500">{areaLabel(g.area)}{sug.length ? ` · ${sug.map((x) => x.label).join(" · ")}` : ""}</p></div>
+                <span className="text-sm tabular-nums text-neutral-700">{alloc[g.id] ?? 0} min</span>
+                {sug[0] ? <Link href={sug[0].href} className="text-sm text-neutral-600 hover:underline">Open</Link> : null}
+              </li>); })}
           </ul>
-        ) : <p className="text-sm text-neutral-500">{day.goals.length ? `The hour fills today's ${budget} minutes. The rest of your goals wait for a longer day.` : <>No goals yet. <Link href="/goals" className="underline">Seven questions</Link> and this list fills itself.</>}</p>}
+        ) : <p className="text-sm text-neutral-500">{day.goals.length ? "No minutes committed today. Tap Change to give a goal some." : <>No goals yet. <Link href="/goals" className="underline">Seven questions</Link> and this list fills itself.</>}</p>}
       </section>
 
       {day.habits.length ? (
@@ -181,7 +198,7 @@ function fitSlots(plan: PlanView, budget: number): { fits: boolean[]; used: numb
 
 function UpdatesLine({ onSaved, evening }: { onSaved: () => void; evening: boolean }) {
   const [open, setOpen] = useState(evening);
-  if (!open) return <button className="rise rise-2 w-full rounded-2xl border border-dashed border-neutral-300 px-4 py-3 text-left text-sm text-neutral-600 hover:bg-white" onClick={() => setOpen(true)}>+ Add an update</button>;
+  if (!open) return <button id="updates" className="rise rise-2 w-full rounded-2xl border border-dashed border-neutral-300 px-4 py-3 text-left text-sm text-neutral-600 hover:bg-white" onClick={() => setOpen(true)}>+ Add an update</button>;
   return <div className="rise rise-2"><JournalCard compact onSaved={() => { onSaved(); if (!evening) setOpen(false); }} /></div>;
 }
 

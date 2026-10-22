@@ -91,3 +91,11 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 9.2 Goals questionnaire (`/goals`): seven questions, WOOP shape, editable; the list it produces.
 - [x] 9.3 Daily plan ritual on Home: the questionnaire owns the page (time, goal for today, energy, then the check-in: sleep, mood, exercise), "Making today's plan…" for a beat, then the plan; one line with Change afterwards; the separate check-in card is gone from Home (it lives in Life).
 - [x] 9.4 One daily question (time); goals fixed; "what is possible" = the hour's slots that fit, then the goals' items with the minutes left; Home shows the next slot that fits, a one-sentence Today line, a collapsed "+ Add an update" line. Decided with the owner as PM/UX/HCI (session 2026-10-22).
+
+## Phase 10 — the morning check-in (PRD §1, §4.8; product goal set by the owner 2026-10-22)
+- [x] 10.1 Essential priority: one tap after the time, stored in `focus_goal_id`, leads the Today line.
+- [x] 10.2 Minutes per goal: defaults from the time (essential gets half), 5-minute steppers, `day_plans.allocations`; commitments list on Home with concrete next steps per area; the hour belongs to a Craft/Career goal.
+- [x] 10.3 Encouraging summary: deterministic line during "Making today's plan…", saved in `day_plans.summary`, shown under the Today line.
+- [x] 10.4 Neutral goal areas (Career, Craft, Body, Mind, Money, People, Projects, Other); old rows mapped in migration 0013; landing copy and PRD §1 rewritten around the product goal.
+- [x] 10.5 See today: manual "busy until" proposes realistic free time; suggestion stored next to the confirmed number.
+- [ ] 10.6 Google Calendar read-only: fills "busy until" from the day's events (needs the Google OAuth client; same one as Google sign-in).
