@@ -37,9 +37,9 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [ ] 2.5 Drag-and-drop memory cards (dnd-kit): Pinned, goals, projects.
 
 ## Phase 3 — Jobs and Network
-- [ ] 3.1 `applications` + Kanban by stage with dnd-kit; import from v1.
-- [ ] 3.2 Add by link with auto-fill; named search windows.
-- [ ] 3.3 Funnel, assessments, intro calls.
+- [x] 3.1 `applications` + Kanban by stage with dnd-kit; import from v1.
+- [x] 3.2 Add by link with auto-fill; named search windows.
+- [x] 3.3 Funnel, assessments, intro calls.
 - [ ] 3.4 `people`, `events`, follow-ups; links to applications.
 - [ ] 3.5 Gmail (MCP) read-only suggestions, approved by click; Jobs and Network agents.
 
