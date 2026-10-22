@@ -1,17 +1,17 @@
 "use client";
 import { useEffect, useState } from "react";
-import { getJobs, startSearch } from "./actions";
+import { getJobs } from "../actions";
 import { ACTIVE, STAGES, STAGE_LABEL, type JobsState } from "@/lib/jobs/types";
-import { btn, Card, field, JobsNav, localDate, Shell, Stat } from "./ui";
+import { Card, field, JobsNav, localDate, Shell, Stat } from "../ui";
 
 const sidKey = "jobs.sid";
-export function OverviewClient() {
+export function InsightsClient() {
   const [S, setS] = useState<JobsState | null>(null);
   const [err, setErr] = useState<string | null>(null);
   const load = () => getJobs(typeof localStorage !== "undefined" ? localStorage.getItem(sidKey) : null, localDate()).then(setS).catch((e) => setErr(String(e?.message ?? e)));
   useEffect(() => { load(); }, []);
-  if (err) return <Shell><JobsNav active="overview" /><p className="text-red-700">{err}</p></Shell>;
-  if (!S) return <Shell><JobsNav active="overview" /><p className="text-neutral-500">Loading…</p></Shell>;
+  if (err) return <Shell><JobsNav active="insights" /><p className="text-red-700">{err}</p></Shell>;
+  if (!S) return <Shell><JobsNav active="insights" /><p className="text-neutral-500">Loading…</p></Shell>;
   const A = S.apps, by: Record<string, number> = {}; A.forEach((a) => (by[a.stage] = (by[a.stage] ?? 0) + 1));
   const d = (n: number) => { const x = new Date(S.today + "T12:00"); x.setDate(x.getDate() - n); return x.toISOString().slice(0, 10); };
   const wk = new Set(Array.from({ length: 7 }, (_, i) => d(i)));
@@ -23,15 +23,13 @@ export function OverviewClient() {
   const funnel = [["Applied", A.length], ["Heard back", replied], ["Interviewing", interviews], ["Final round", finals], ["Offer", offers]] as [string, number][];
   return (
     <Shell>
-      <JobsNav active="overview" />
+      <JobsNav active="insights" />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm text-neutral-500">{sv ? `${sv.name} · ${sv.end ? `${sv.start} to ${sv.end} (finished)` : `since ${sv.start}`}` : "All time"}</p>
         <div className="flex items-center gap-2">
           <select className={field} value={S.viewing} onChange={(e) => { localStorage.setItem(sidKey, e.target.value); load(); }}>{S.searches.map((s) => <option key={s.id} value={s.id}>{s.name}{s.end ? "" : " (current)"}</option>)}<option value="all">All time</option></select>
-          {S.viewing === S.search ? <button className={btn} onClick={async () => { const name = prompt("Name the new search. The current one is closed today and stays viewable.", `Job search ${S.searches.length + 1}`); if (name === null) return; const r = await startSearch(name, localDate()); localStorage.setItem(sidKey, r.id); load(); }}>Start a new job search</button> : null}
         </div>
       </div>
-      {asN + callN ? <a href="/jobs/action" className="block rounded-xl bg-amber-50 p-4 text-sm text-amber-900">{asN + callN} to do: {asN} assessment{asN === 1 ? "" : "s"} and {callN} intro call{callN === 1 ? "" : "s"} need you →</a> : null}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Stat label="Total applied" value={A.length} /><Stat label="By the agent" value={A.filter((a) => a.source === "agent").length} /><Stat label="By you" value={A.filter((a) => a.source === "me").length} /><Stat label="Last 7 days" value={A.filter((a) => wk.has(a.applied_on)).length} />
         <Stat label="In calls / interviews" value={A.filter((a) => ACTIVE.includes(a.stage)).length} /><Stat label="Assessments needed" value={asN} tone={asN ? "orange" : undefined} /><Stat label="Intro calls to set up" value={callN} tone={callN ? "orange" : undefined} /><Stat label="Waiting for you to apply" value={S.todo.length} />

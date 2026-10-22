@@ -26,9 +26,9 @@ export async function getJobs(sid: string | null, clientDate?: string): Promise<
 }
 
 /** Change stage / notes / follow-up on one application. Stage changes are appended to its history. */
-export async function updateApplication(id: string, patch: { stage?: Stage; notes?: string; follow_up?: string }, clientDate?: string): Promise<{ ok: true }> {
+export async function updateApplication(id: string, patch: { stage?: Stage; notes?: string; follow_up?: string; next_action?: string; next_action_on?: string | null; last_contact_on?: string | null }, clientDate?: string): Promise<{ ok: true }> {
   const { supabase } = await ctx();
-  id = parse(idS, id); patch = parse(z.object({ stage: stageS.optional(), notes: longText(4000).optional(), follow_up: shortText(500).optional() }), patch);
+  id = parse(idS, id); patch = parse(z.object({ stage: stageS.optional(), notes: longText(4000).optional(), follow_up: shortText(500).optional(), next_action: shortText(200).optional(), next_action_on: isoDate.nullable().optional(), last_contact_on: isoDate.nullable().optional() }), patch);
   const { data: cur } = await supabase.from("applications").select("stage,history").eq("id", id).maybeSingle();
   if (!cur) throw new Error("not found");
   const row: Record<string, unknown> = { updated_at: new Date().toISOString() };
@@ -37,6 +37,9 @@ export async function updateApplication(id: string, patch: { stage?: Stage; note
   }
   if (patch.notes !== undefined) row.notes = patch.notes.slice(0, 4000);
   if (patch.follow_up !== undefined) row.follow_up = patch.follow_up.slice(0, 500);
+  if (patch.next_action !== undefined) row.next_action = patch.next_action.slice(0, 200);
+  if (patch.next_action_on !== undefined) row.next_action_on = patch.next_action_on;
+  if (patch.last_contact_on !== undefined) row.last_contact_on = patch.last_contact_on;
   const { error } = await supabase.from("applications").update(row).eq("id", id);
   if (error) throw new Error(error.message);
   bump();
@@ -120,3 +123,22 @@ export async function removeItem(table: "assessments" | "actions" | "application
 }
 
 export type { Application, Stage };
+
+/** Stale application: schedule a follow-up for today. Nothing else changes. */
+export async function nudge(id: string, clientDate?: string): Promise<{ ok: true }> {
+  return updateApplication(id, { next_action: "Follow up with the recruiter", next_action_on: validDate(clientDate) }, clientDate);
+}
+/** The next action was done: clear it and record the contact date. */
+export async function completeNextAction(id: string, clientDate?: string): Promise<{ ok: true }> {
+  return updateApplication(id, { next_action: "", next_action_on: null, last_contact_on: validDate(clientDate) }, clientDate);
+}
+
+/** Bulk close the gone-quiet list as "No reply". One update, no per-row history entry (the stage change is the record). */
+export async function markNoReply(ids: string[]): Promise<{ ok: true; n: number }> {
+  const { supabase } = await ctx();
+  const list = parse(z.array(idS).min(1).max(1000), ids);
+  const { error } = await supabase.from("applications").update({ stage: "ghosted", updated_at: new Date().toISOString() }).in("id", list).eq("stage", "applied");
+  if (error) throw new Error(error.message);
+  bump();
+  return { ok: true, n: list.length };
+}
