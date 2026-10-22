@@ -13,7 +13,7 @@ export function PracticeClient({ initialTrack }: { initialTrack: string }) {
   const [track, setTrack] = useState<Track>((TRACKS as string[]).includes(initialTrack) ? (initialTrack as Track) : "leetcode");
   const [D, setD] = useState<PracticeData | null>(null);
   const [f, setF] = useState({ q: "", d: "", c: "", list: "", co: "", due: true });
-  useEffect(() => { setD(null); getPractice(track).then(setD).catch(() => setD(null)); }, [track]);
+  useEffect(() => { let live = true; getPractice(track).then((d) => { if (live) setD(d); }).catch(() => { if (live) setD(null); }); return () => { live = false; }; }, [track]);
   const today = localDate();
 
   const L = useMemo(() => {
@@ -47,7 +47,7 @@ export function PracticeClient({ initialTrack }: { initialTrack: string }) {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {next ? <a href={href(next.id)} className="inline-flex h-9 items-center rounded-lg bg-neutral-900 px-3 text-sm font-medium text-white hover:bg-neutral-800">Start next: {next.title}</a> : null}
-            {L.length ? <a href={href(L[Math.floor(Math.random() * L.length)].id)} className="inline-flex h-9 items-center rounded-lg border border-neutral-300 bg-white px-3 text-sm hover:bg-neutral-50">Random</a> : null}
+            {L.length ? <button type="button" onClick={() => { window.location.href = href(L[Math.floor(Math.random() * L.length)].id); }} className="inline-flex h-9 items-center rounded-lg border border-neutral-300 bg-white px-3 text-sm hover:bg-neutral-50">Random</button> : null}
             <span className="text-sm text-neutral-500">{L.length} of {D.items.length}</span>
           </div>
           <div className="overflow-hidden rounded-2xl border border-neutral-200 bg-white">

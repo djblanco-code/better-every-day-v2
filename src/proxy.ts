@@ -4,7 +4,7 @@ import { publicEnv } from "@/lib/env";
 import { isProtected, INVITE_PATH, SIGN_IN_PATH, redirectFor } from "@/lib/auth/routes";
 
 // Refreshes the Supabase session cookie on every request and applies the routing rules in lib/auth/routes.
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
   let env: ReturnType<typeof publicEnv>;
   try {

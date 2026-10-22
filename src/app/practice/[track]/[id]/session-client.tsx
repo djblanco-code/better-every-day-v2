@@ -17,7 +17,7 @@ export function SessionClient(props: {
   const [text, setText] = useState(props.draft.text);
   const [startedAt, setStartedAt] = useState<number | null>(props.draft.startedAt ? Date.parse(props.draft.startedAt) : null);
   const [mins, setMins] = useState(DEFAULT_MIN);
-  const [now, setNow] = useState(Date.now());
+  const [now, setNow] = useState(() => Date.now());
   const [saved, setSaved] = useState<"saved" | "saving" | "unsaved" | "error">("saved");
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [grading, setGrading] = useState<string | null>(null);

@@ -51,5 +51,6 @@ Work top to bottom. One task per session. A task is done only when its "Done whe
 - [x] 4.5 `npm audit fix` and pin; scheduled weekly CI run of gitleaks + audit. (from docs/ASSESSMENT.md)
 - [x] 4.6 zod-validate every server-action input; per-user rate limit on model-calling actions.
 - [x] 4.7 Lighthouse in CI (`@lhci/cli`) with budgets; anything under 90 on mobile gets fixed.
+- [x] 4.10 Next 16 upgrade: closes the postcss advisory (`npm audit --omit=dev` = 0), flat ESLint config, `middleware.ts` → `proxy.ts`, React Compiler lint fixes.
 - [x] 4.9 Mobile shell: bottom tab bar on phones, top bar on wide screens, tables become cards under 768px, 16px inputs (no iOS zoom), safe-area padding, install nudge; per-minute AI rate limiter.
 - [x] 4.8 Dialog focus trap + `aria-live` status messages; axe-core smoke test on the main pages.
