@@ -81,6 +81,25 @@ Goal: one hour a day, six months, with the same engine as v1 and a better UI.
 - N1. People (name, company, role, relationship, met at, how they can help, follow-up), events, follow-ups.
 - N2. Links between people, companies and applications.
 
+### 4.6 Life (phase 6): habits, health, money, and a Today that fits the day
+Goal: the three work modules were missing the rest of the day. Life holds habits, a daily check-in and money,
+and Today becomes "your day" instead of only the Recall plan.
+- L1. **Habits**: a short list (name, cadence daily/weekdays/weekly, weekly target), one tap per day, a 14-day
+  grid and a weekly completion rate. Misses are shown, never punished; no streak freezes, no gamification.
+- L2. **Check-in**: one row per day: sleep hours, energy 1-5, mood 1-5, exercise minutes, optional weight, and
+  "time for Recall today" (20/40/60/90 min). Takes under 20 seconds. From Today or from Life.
+- L3. **Money**: expenses and income by category with a standing monthly limit per category; the month view
+  leads with "spent vs limit" per category, then a list. Manual entry and journal entry only; no bank sync.
+- L4. **Today = your day**: check-in on top; "needs you today" (assessments and intro calls due or overdue,
+  network follow-ups); the Recall plan trimmed to the time available (slots that do not fit are shown as
+  "if time allows", never dropped from the plan); today's habits; readiness and money at a glance.
+  Low energy (1-2) with no time set suggests 40 minutes with the review slot first.
+- L5. **Journal** also parses expenses ("spent $14 on lunch"), health ("slept 6 hours, ran 30 min") and
+  habits that already exist by name. It never creates a habit or a category from a note.
+Sources: Sunsama's morning ritual (short fixed sequence, realistic commitment, shutdown review); TickTick for
+tasks + habits in one view; contribution-style habit grids; budget dashboards that lead with the period and
+the remaining decision before analytics.
+
 ### 4.5 Chat (the Claude wrapper, phase 2+)
 - C1. A chat page with the user's own key, streaming, with tools scoped per request (read-only by default).
 - C2. Orchestrator routes to Memory / Recall coach / Jobs / Network agents; each has its own prompt, output
@@ -107,7 +126,10 @@ item_id, score, sub, verdict, strengths, gaps, answer, minutes_used, timer_minut
 `external_reps`(user_id, date, kind, with, rating, minutes) · `journal_entries`(user_id, date, text, summary,
 items json, parser) · `memories`(user_id, type, content, source, embedding vector(1536), importance,
 use_count, pinned, archived_at) · `applications`(user_id, company, role, url, stage, applied_on, notes,
-search_id) · `people`, `events`, `audit_log`(user_id, agent, tool, input_hash, result, tokens, cost_cents).
+search_id) · `people`, `events`, `audit_log`(user_id, agent, tool, input_hash, result, tokens, cost_cents) ·
+`habits`(user_id, id, name, cadence, target_per_week, active) · `habit_logs`(user_id, habit_id, date, done) ·
+`checkins`(user_id, date, sleep_hours, energy, mood, exercise_minutes, weight, time_available) ·
+`transactions`(user_id, id, date, kind, amount_cents, category, merchant) · `budgets`(user_id, category, limit_cents).
 Every table: `user_id` + RLS.
 
 ## 7. Success metrics

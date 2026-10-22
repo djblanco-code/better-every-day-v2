@@ -25,13 +25,16 @@ export default async function Home() {
     );
   }
   const today = new Date().toISOString().slice(0, 10);
-  const [{ banks, cur }, st, apps, assess, actions, people, events] = await Promise.all([
+  const [{ banks, cur }, st, apps, assess, actions, people, events, habits, hlogs, spend] = await Promise.all([
     loadBanks(supabase), loadState(supabase, today),
     supabase.from("applications").select("stage,kind").eq("kind", "applied"),
     supabase.from("assessments").select("status").in("status", ["todo", "expired"]),
     supabase.from("actions").select("done").eq("done", false),
     supabase.from("people").select("follow_up,follow_up_done"),
     supabase.from("events").select("id"),
+    supabase.from("habits").select("id,cadence").eq("active", true),
+    supabase.from("habit_logs").select("habit_id").eq("date", today).eq("done", true),
+    supabase.from("transactions").select("amount_cents").eq("kind", "expense").gte("date", today.slice(0, 7) + "-01"),
   ]);
   const s = summary(st, banks, cur, today);
   const A = (apps.data ?? []) as { stage: string }[];
@@ -40,6 +43,7 @@ export default async function Home() {
     <HomeClient email={user.email ?? ""} counts={{
       apps: A.length, need: (assess.data?.length ?? 0) + (actions.data?.length ?? 0), interviewing: A.filter((a) => (ACTIVE as string[]).includes(a.stage)).length,
       streak: s.streak, minutes: Math.round(s.today_minutes), readiness: s.readiness_overall, people: P.length, events: events.data?.length ?? 0, follow_ups: P.filter((p) => p.follow_up && !p.follow_up_done).length,
+      habits_done: hlogs.data?.length ?? 0, habits_total: habits.data?.length ?? 0, spent_cents: (spend.data ?? []).reduce((a: number, t: { amount_cents: number }) => a + t.amount_cents, 0),
     }} />
   );
 }
